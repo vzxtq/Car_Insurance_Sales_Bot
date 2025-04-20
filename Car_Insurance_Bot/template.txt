@@ -1,0 +1,10 @@
+Insurance Policy
+
+Policy Number: {POLICY_NUMBER}
+Name: {NAME}
+Passport: {PASSPORT}
+Insurance Type: Car
+Price: {PRICE}
+Status: Active
+
+Thank you for using our service!

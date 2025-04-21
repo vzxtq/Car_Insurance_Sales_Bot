@@ -1,30 +1,44 @@
+using Car_Insurance_Bot.Handlers;
 using Microsoft.Extensions.Hosting;
 using Telegram.Bot;
 using Telegram.Bot.Polling;
-using Telegram.Bot.Types;
 using Telegram.Bot.Types.Enums;
 
-public class BotBackgroundService : BackgroundService
+namespace Car_Insurance_Bot.Infrastructure
 {
-    private readonly ITelegramBotClient _botClient;
-    private readonly UpdateHandler _handler;
-
-    public BotBackgroundService(ITelegramBotClient botClient, UpdateHandler handler)
+    public class BotBackgroundService : BackgroundService
     {
-        _botClient = botClient;
-        _handler = handler;
-    }
+        private readonly ITelegramBotClient _botClient;
+        private readonly UpdateHandler _handler;
 
-    protected override async Task ExecuteAsync(CancellationToken stoppingToken)
-    {
-        _botClient.StartReceiving(
-            _handler.HandleUpdateAsync,
-            _handler.HandleErrorAsync,
-            new ReceiverOptions { AllowedUpdates = Array.Empty<UpdateType>() },
+        public BotBackgroundService(ITelegramBotClient botClient, UpdateHandler handler)
+        {
+            _botClient = botClient;
+            _handler = handler;
+        }
+
+        protected override async Task ExecuteAsync(CancellationToken stoppingToken)
+        {
+            var receiverOptions = new ReceiverOptions
+            {
+                AllowedUpdates = Array.Empty<UpdateType>()
+            };
+
+            _botClient.StartReceiving(
+            updateHandler: async (client, update, token) =>
+            {
+                await _handler.HandleUpdateAsync(client, update, token);
+            },
+            pollingErrorHandler: async (client, exception, token) =>
+            {
+                await _handler.HandleErrorAsync(client, exception, token);
+            },
+            receiverOptions: new ReceiverOptions(),
             cancellationToken: stoppingToken
-        );
+            );
 
-        var me = await _botClient.GetMeAsync();
-        Console.WriteLine($"Bot {me.Username} is up and running");
+            var botInfo = await _botClient.GetMeAsync(stoppingToken);
+            Console.WriteLine($"[INFO] Bot @{botInfo.Username} is up and running.");
+        }
     }
 }

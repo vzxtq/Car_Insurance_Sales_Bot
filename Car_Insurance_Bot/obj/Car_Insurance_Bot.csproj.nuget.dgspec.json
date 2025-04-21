@@ -1,17 +1,17 @@
 {
   "format": 1,
   "restore": {
-    "C:\\Users\\user\\New folder\\car_insurance_bot\\Car_Insurance_Bot.csproj": {}
+    "C:\\Users\\user\\insurance_bot\\Car_Insurance_Bot\\Car_Insurance_Bot.csproj": {}
   },
   "projects": {
-    "C:\\Users\\user\\New folder\\car_insurance_bot\\Car_Insurance_Bot.csproj": {
+    "C:\\Users\\user\\insurance_bot\\Car_Insurance_Bot\\Car_Insurance_Bot.csproj": {
       "version": "1.0.0",
       "restore": {
-        "projectUniqueName": "C:\\Users\\user\\New folder\\car_insurance_bot\\Car_Insurance_Bot.csproj",
+        "projectUniqueName": "C:\\Users\\user\\insurance_bot\\Car_Insurance_Bot\\Car_Insurance_Bot.csproj",
         "projectName": "Car_Insurance_Bot",
-        "projectPath": "C:\\Users\\user\\New folder\\car_insurance_bot\\Car_Insurance_Bot.csproj",
+        "projectPath": "C:\\Users\\user\\insurance_bot\\Car_Insurance_Bot\\Car_Insurance_Bot.csproj",
         "packagesPath": "C:\\Users\\user\\.nuget\\packages\\",
-        "outputPath": "C:\\Users\\user\\New folder\\car_insurance_bot\\obj\\",
+        "outputPath": "C:\\Users\\user\\insurance_bot\\Car_Insurance_Bot\\obj\\",
         "projectStyle": "PackageReference",
         "fallbackFolders": [
           "C:\\Program Files (x86)\\Microsoft Visual Studio\\Shared\\NuGetPackages"
@@ -51,6 +51,14 @@
         "net9.0": {
           "targetAlias": "net9.0",
           "dependencies": {
+            "Emgu.CV": {
+              "target": "Package",
+              "version": "[4.10.0.5680, )"
+            },
+            "Emgu.CV.runtime.windows": {
+              "target": "Package",
+              "version": "[4.10.0.5680, )"
+            },
             "Microsoft.Extensions.Hosting": {
               "target": "Package",
               "version": "[9.0.4, )"
@@ -63,9 +71,29 @@
               "target": "Package",
               "version": "[2.1.0, )"
             },
+            "OpenCvSharp4": {
+              "target": "Package",
+              "version": "[4.10.0.20241108, )"
+            },
+            "OpenCvSharp4.Windows": {
+              "target": "Package",
+              "version": "[4.10.0.20241108, )"
+            },
+            "OpenCvSharp4.runtime.win": {
+              "target": "Package",
+              "version": "[4.10.0.20241108, )"
+            },
+            "SixLabors.ImageSharp": {
+              "target": "Package",
+              "version": "[3.1.7, )"
+            },
             "Telegram.Bot": {
               "target": "Package",
               "version": "[18.1.5, )"
+            },
+            "Tesseract": {
+              "target": "Package",
+              "version": "[5.2.0, )"
             },
             "itext7": {
               "target": "Package",

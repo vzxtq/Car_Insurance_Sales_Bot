@@ -5,6 +5,8 @@ using Telegram.Bot.Types.ReplyMarkups;
 using Car_Insurance_Bot.Services;
 using System.Collections.Concurrent;
 using Microsoft.Extensions.Configuration;
+using System.Text;
+using System.Text.Json;
 
 namespace Car_Insurance_Bot.Handlers
 {
@@ -13,16 +15,19 @@ namespace Car_Insurance_Bot.Handlers
         private readonly ITelegramBotClient _botClient;
         private readonly InsuranceService _insuranceService;
         private readonly string? _botToken;
-        private readonly TesseractPassportService _tesseractService;
+        private readonly string? _geminiApiKey;
+        private readonly TesseractService _tesseractService;
         private static readonly ConcurrentDictionary<long, (string Name, string Passport)> _userData = new();
         private static readonly ConcurrentDictionary<long, string> _userState = new();
 
-        public UpdateHandler(IConfiguration configuration, ITelegramBotClient botClient, InsuranceService insuranceService, TesseractPassportService tesseractService)
+        public UpdateHandler(IConfiguration configuration, ITelegramBotClient botClient, 
+                            InsuranceService insuranceService, TesseractService tesseractService)
         {
             _botClient = botClient;
             _insuranceService = insuranceService;
             _tesseractService = tesseractService;
             _botToken = configuration["Telegram:BotToken"];
+            _geminiApiKey = configuration["GeminiAi:ApiKey"];
         }
 
         public async Task HandleUpdateAsync(ITelegramBotClient botClient, Update update, CancellationToken ct)
@@ -46,21 +51,109 @@ namespace Car_Insurance_Bot.Handlers
             }
         }
 
-        private async Task HandleTextMessageAsync(ITelegramBotClient botClient, Message message, long chatId)
+        private async Task<string> SendToGeminiAsync(string prompt)
         {
-            switch (message.Text?.ToLower())
-            {
-                case "/start":
-                    _userState[chatId] = "started";
-                    await botClient.SendTextMessageAsync(chatId,"Hello! I can help you get car insurance. Please send a photo (file) of your passport.");
-                    break;
+            var url = $"https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key={_geminiApiKey}";
 
-                default:
-                    await botClient.SendTextMessageAsync(chatId, "I'm here to help you with insurance. Type /start to begin.");
-                    break;
+            var payload = new
+            {
+                contents = new[]
+                {
+                    new {
+                        parts = new[]
+                        {
+                            new { text = prompt }
+                        }
+                    }
+                }
+            };
+
+            using var client = new HttpClient();
+            var json = JsonSerializer.Serialize(payload);
+            var content = new StringContent(json, Encoding.UTF8, "application/json");
+
+            var response = await client.PostAsync(url, content);
+
+            if (!response.IsSuccessStatusCode)
+                return $"AI request failed. Status: {response.StatusCode}";
+
+            var responseJson = await response.Content.ReadAsStringAsync();
+
+            try
+            {
+                var options = new JsonSerializerOptions
+                {
+                    PropertyNameCaseInsensitive = true
+                };
+
+                var geminiResponse = JsonSerializer.Deserialize<GeminiResponse>(responseJson, options);
+
+                var text = geminiResponse?.Candidates?
+                    .FirstOrDefault()?.Content?
+                    .Parts?.FirstOrDefault()?.Text;
+
+                return string.IsNullOrWhiteSpace(text) ? "AI returned empty response." : text;
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine("JSON Parse Error: " + ex.Message);
+                Console.WriteLine("Full Response: " + responseJson);
+                return "AI response parse error.";
             }
         }
 
+        private async Task HandleTextMessageAsync(ITelegramBotClient botClient, Message message, long chatId)
+        {
+            var userInput = message.Text?.ToLower();
+
+            switch (userInput)
+            {
+                case "/start":
+                    _userState[chatId] = "idle";
+                    await botClient.SendTextMessageAsync(chatId, "👋 Welcome! Use /insurance to start or /chat to talk to AI.");
+                    return;
+
+                case "/insurance":
+                    _userState[chatId] = "started";
+                    await botClient.SendTextMessageAsync(chatId, "🚗 Let's get your car insured. Please send a photo of your passport.");
+                    return;
+
+                case "/chat":
+                    _userState[chatId] = "chat";
+                    await botClient.SendTextMessageAsync(chatId, "🧠 Chat mode activated! Ask me anything.");
+                    return;
+            }
+
+            if (!_userState.TryGetValue(chatId, out var state))
+            {
+                await botClient.SendTextMessageAsync(chatId, "Please use /start to begin.");
+                return;
+            }
+
+            switch (state)
+            {
+                case "chat":
+                    var reply = await SendToGeminiAsync(message.Text);
+                    await botClient.SendTextMessageAsync(chatId, reply);
+                    break;
+
+                case "started":
+                    await botClient.SendTextMessageAsync(chatId, "📸 Please send your passport photo (file).");
+                    break;
+
+                case "awaiting_confirm":
+                    await botClient.SendTextMessageAsync(chatId, "✅ Please confirm the data using the buttons.");
+                    break;
+
+                case "confirmed":
+                    await botClient.SendTextMessageAsync(chatId, "💰 Please respond to the price offer below.");
+                    break;
+
+                default:
+                    await botClient.SendTextMessageAsync(chatId, "🤖 I'm not sure what to do. Try /chat or /insurance.");
+                    break;
+            }
+        }
         private async Task HandleFileMessageAsync(ITelegramBotClient botClient, Message message, long chatId)
         {
             if (!_userState.ContainsKey(chatId))
@@ -221,13 +314,15 @@ namespace Car_Insurance_Bot.Handlers
                 return;
             }
 
-            var policyText = await _insuranceService.GeneratePolicyAsync(userInfo.Name, userInfo.Passport, "100 USD");
+            var vin = new VinMock().Vin("");
+
+            var policyText = await _insuranceService.GeneratePolicyAsync(userInfo.Name, userInfo.Passport, vin, "100 USD");
             await botClient.SendTextMessageAsync(chatId, EscapeMarkdown(policyText), parseMode: ParseMode.MarkdownV2);
         }
 
         private string EscapeMarkdown(string text)
         {
-            var specialChars = new[] { "_", "*", "[", "]", "(", ")", "~", "`", ">", "#", "+", "-", "=", "|", "{", "}", ".", "!" };
+            var specialChars = new[] { "_", "*", "[", "]", "(", ")", "~", ">", "#", "+", "-", "=", "|", "{", "}", ".", "!" };
             foreach (var c in specialChars)
             {
                 text = text.Replace(c, "\\" + c);

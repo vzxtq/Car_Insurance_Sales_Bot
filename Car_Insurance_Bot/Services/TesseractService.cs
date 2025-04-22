@@ -4,11 +4,11 @@ using OpenCvSharp;
 
 namespace Car_Insurance_Bot.Services
 {
-    public class TesseractPassportService
+    public class TesseractService
     {
         private readonly string _tessDataPath;
 
-        public TesseractPassportService(string tessDataPath)
+        public TesseractService(string tessDataPath)
         {
             _tessDataPath = tessDataPath;
         }

@@ -1,10 +1,11 @@
-Insurance Policy
+📄 Insurance Policy
 
 Policy Number: {POLICY_NUMBER}
 Name: {NAME}
 Passport: {PASSPORT}
+VIN: {VIN}
 Insurance Type: Car
 Price: {PRICE}
 Status: Active
 
-Thank you for using our service!
+Thank you for using our service! ❤️

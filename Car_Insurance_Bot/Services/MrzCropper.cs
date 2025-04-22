@@ -15,10 +15,9 @@ namespace Car_Insurance_Bot.Services
 
             var roi = new OpenCvSharp.Rect(0, (int)(image.Rows * 0.8), targetWidth, (int)(image.Rows * 0.2));
             var mrzRegion = new OpenCvSharp.Mat(image, roi);
-            
-            Cv2.GaussianBlur(mrzRegion, mrzRegion, new OpenCvSharp.Size(3, 3), 0);//noise reduction and text enchancement
-            Cv2.Threshold(mrzRegion, mrzRegion, 100, 255, ThresholdTypes.BinaryInv);//fixed thresholding
 
+            Cv2.GaussianBlur(mrzRegion, mrzRegion, new OpenCvSharp.Size(3, 3), 0);//noise reduction and text enchancement
+            Cv2.Threshold(mrzRegion, mrzRegion, 0, 255, ThresholdTypes.Binary | ThresholdTypes.Otsu);
             string outputPath = Path.Combine(Path.GetDirectoryName(inputPath), "mrz_" + Path.GetFileName(inputPath));
             Cv2.ImWrite(outputPath, mrzRegion);
 

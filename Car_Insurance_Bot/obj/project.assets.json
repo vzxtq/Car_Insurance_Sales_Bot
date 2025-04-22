@@ -2086,7 +2086,7 @@
           }
         }
       },
-      "System.Text.Json/9.0.0": {
+      "System.Text.Json/9.0.4": {
         "type": "package",
         "compile": {
           "lib/net9.0/System.Text.Json.dll": {
@@ -6232,10 +6232,10 @@
         "system.text.encoding.extensions.nuspec"
       ]
     },
-    "System.Text.Json/9.0.0": {
-      "sha512": "js7+qAu/9mQvnhA4EfGMZNEzXtJCDxgkgj8ohuxq/Qxv+R56G+ljefhiJHOxTNiw54q8vmABCWUwkMulNdlZ4A==",
+    "System.Text.Json/9.0.4": {
+      "sha512": "pYtmpcO6R3Ef1XilZEHgXP2xBPVORbYEzRP7dl0IAAbN8Dm+kfwio8aCKle97rAWXOExr292MuxWYurIuwN62g==",
       "type": "package",
-      "path": "system.text.json/9.0.0",
+      "path": "system.text.json/9.0.4",
       "files": [
         ".nupkg.metadata",
         ".signature.p7s",
@@ -6298,7 +6298,7 @@
         "lib/net9.0/System.Text.Json.xml",
         "lib/netstandard2.0/System.Text.Json.dll",
         "lib/netstandard2.0/System.Text.Json.xml",
-        "system.text.json.9.0.0.nupkg.sha512",
+        "system.text.json.9.0.4.nupkg.sha512",
         "system.text.json.nuspec",
         "useSharedDesignerContext.txt"
       ]
@@ -6785,6 +6785,7 @@
       "OpenCvSharp4.Windows >= 4.10.0.20241108",
       "OpenCvSharp4.runtime.win >= 4.10.0.20241108",
       "SixLabors.ImageSharp >= 3.1.7",
+      "System.Text.Json >= 9.0.4",
       "Telegram.Bot >= 18.1.5",
       "Tesseract >= 5.2.0",
       "itext7 >= 9.1.0"
@@ -6880,6 +6881,10 @@
           "SixLabors.ImageSharp": {
             "target": "Package",
             "version": "[3.1.7, )"
+          },
+          "System.Text.Json": {
+            "target": "Package",
+            "version": "[9.0.4, )"
           },
           "Telegram.Bot": {
             "target": "Package",

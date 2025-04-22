@@ -1,7 +1,6 @@
 # Car Insurance Telegram Bot
 
-A Telegram bot that guides users through a car insurance process using OCR, AI-generated responses, and interactive steps.
-
+A Telegram bot that handles the car insurance process by processing documents with OCR, providing AI-generated responses, and guiding users step by step to complete the insurance
 ---
 
 ## 🚀 Setup Instructions
@@ -10,7 +9,7 @@ A Telegram bot that guides users through a car insurance process using OCR, AI-g
 
 Make sure you have the following installed:
 
-- [.NET 9.0 SDK]
+- .NET 9.0 SDK
 - [Tesseract OCR](https://github.com/tesseract-ocr/tesseract) (ensure `tesseract` is installed and available in your PATH)
 - A valid [Telegram Bot Token]
 - Google Gemini API Key (for chat functionality)

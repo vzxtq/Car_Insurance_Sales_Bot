@@ -95,7 +95,6 @@ Is this correct?
 
 **Bot:**
 ```
----
 📄 Insurance Policy
 
 Policy Number: 3E821273
@@ -107,7 +106,6 @@ Price: 100 USD
 Status: Active
 
 Thank you for using our service! ❤️
----
 ```
 
 ---

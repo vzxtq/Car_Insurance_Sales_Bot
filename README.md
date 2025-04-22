@@ -1,6 +1,6 @@
 # Car Insurance Telegram Bot
 
-A Telegram bot that handles the car insurance process by processing documents with OCR, providing AI-generated responses, and guiding users step by step to complete the insurance.---
+A Telegram bot that handles the car insurance process by processing documents with OCR, providing AI-generated responses, and guiding users step by step to complete the insurance
 ---
 
 ## 🚀 Setup Instructions

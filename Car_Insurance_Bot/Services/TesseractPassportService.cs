@@ -4,11 +4,11 @@ using OpenCvSharp;
 
 namespace Car_Insurance_Bot.Services
 {
-    public class TesseractService
+    public class TesseractPassportService
     {
         private readonly string _tessDataPath;
 
-        public TesseractService(string tessDataPath)
+        public TesseractPassportService(string tessDataPath)
         {
             _tessDataPath = tessDataPath;
         }
@@ -37,8 +37,31 @@ namespace Car_Insurance_Bot.Services
 
                 Console.WriteLine("OCR Result:\n" + string.Join("\n", lines));
 
-                string line1 = lines.FirstOrDefault(l => l.StartsWith("P<"));
-                string line2 = lines.FirstOrDefault(l => Regex.IsMatch(l, @"^\d{9}"));
+                string line1 = null;
+                string line2 = null;
+
+                if(lines.Length == 1 && lines[0].Length >= 88)
+                {
+                    Console.WriteLine("Mrz possibly not cropped correctly. Trying to split the line...");
+                    string fullMrz =  lines[0].PadRight(88, '<');
+                    line1 = fullMrz.Substring(0, 44);
+                    line2 = fullMrz.Substring(44, 44);
+                }
+                else
+                {
+                    line1 = lines.FirstOrDefault(l => l.StartsWith("P<"));
+                    line2 = lines.FirstOrDefault(l => Regex.IsMatch(l, @"^\d{9}"));
+
+                    if (string.IsNullOrEmpty(line2) && lines.Length >= 2)
+                    {
+                        line2 = lines[1];
+                    }
+                }
+
+                foreach(var line in lines)
+                {
+                    Console.WriteLine($"[OCR Line] ({line.Length}) : {line}");  
+                }
 
                 if (string.IsNullOrEmpty(line1) || string.IsNullOrEmpty(line2))
                     return ("Unknown", "Unknown");

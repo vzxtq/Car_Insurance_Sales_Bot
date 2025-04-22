@@ -13,11 +13,11 @@ namespace Car_Insurance_Bot.Handlers
         private readonly ITelegramBotClient _botClient;
         private readonly InsuranceService _insuranceService;
         private readonly string? _botToken;
-        private readonly TesseractService _tesseractService;
+        private readonly TesseractPassportService _tesseractService;
         private static readonly ConcurrentDictionary<long, (string Name, string Passport)> _userData = new();
         private static readonly ConcurrentDictionary<long, string> _userState = new();
 
-        public UpdateHandler(IConfiguration configuration, ITelegramBotClient botClient, InsuranceService insuranceService, TesseractService tesseractService)
+        public UpdateHandler(IConfiguration configuration, ITelegramBotClient botClient, InsuranceService insuranceService, TesseractPassportService tesseractService)
         {
             _botClient = botClient;
             _insuranceService = insuranceService;
@@ -154,7 +154,7 @@ namespace Car_Insurance_Bot.Handlers
                 case "confirm_no":
                     _userState[chatId] = "confirmed";
                     _userData.TryRemove(chatId, out _);
-                    await botClient.SendTextMessageAsync(chatId, "Please send another photo of your passport.");
+                    await botClient.SendTextMessageAsync(chatId, "Please send another photo (file) of your passport.");
                     break;
 
                 case "agree_price":

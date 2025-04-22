@@ -29,7 +29,7 @@ builder.Services.AddSingleton<UpdateHandler>();
 
 builder.Services.AddHostedService<BotBackgroundService>();
 
-builder.Services.AddSingleton<TesseractService>(sp=>
+builder.Services.AddSingleton<TesseractPassportService>(sp=>
 {
     var tessDataPath = builder.Configuration["TesseractDataPath"];
     if (string.IsNullOrEmpty(tessDataPath))
@@ -37,7 +37,7 @@ builder.Services.AddSingleton<TesseractService>(sp=>
         throw new ArgumentNullException("TesseractDataPath", "Tesseract data path is missing.");
     }
 
-    return new TesseractService(tessDataPath);
+    return new TesseractPassportService(tessDataPath);
 });
 
 var app = builder.Build();

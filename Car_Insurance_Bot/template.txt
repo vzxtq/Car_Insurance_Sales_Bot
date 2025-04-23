@@ -5,7 +5,7 @@ Name: {NAME}
 Passport: {PASSPORT}
 VIN: {VIN}
 Insurance Type: Car
-Price: {PRICE}
+Price: 100 USD
 Status: Active
 
 Thank you for using our service! ❤️

@@ -1,4 +1,3 @@
-
 namespace Car_Insurance_Bot.Utils
 {
     public class MarkDownEscaper

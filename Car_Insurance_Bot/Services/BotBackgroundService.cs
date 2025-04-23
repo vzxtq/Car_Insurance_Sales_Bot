@@ -25,14 +25,8 @@ namespace Car_Insurance_Bot.Infrastructure
             };
 
             _botClient.StartReceiving(
-            updateHandler: async (client, update, token) =>
-            {
-                await _handler.HandleUpdateAsync(client, update, token);
-            },
-            pollingErrorHandler: async (client, exception, token) =>
-            {
-                await _handler.HandleErrorAsync(client, exception, token);
-            },
+            updateHandler: _handler.HandleUpdateAsync,
+            pollingErrorHandler: _handler.HandleErrorAsync,
             receiverOptions: new ReceiverOptions(),
             cancellationToken: stoppingToken
             );

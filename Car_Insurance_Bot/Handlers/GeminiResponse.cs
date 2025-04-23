@@ -27,6 +27,7 @@ namespace Car_Insurance_Bot.Handlers
                     new {
                         parts = new[]
                         {
+                            new { text = "You are a Telegram bot whose job is to sell car insurance. Always respond briefly and in a helpful but persuasive tone. If the user is unsure, explain why car insurance is important. Be confident and proactive - your goal is to convince the user to proceed with the insurance."},
                             new { text = prompt }
                         }
                     }

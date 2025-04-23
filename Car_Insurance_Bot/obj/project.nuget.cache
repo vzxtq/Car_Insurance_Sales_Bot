@@ -1,8 +1,8 @@
 {
   "version": 2,
-  "dgSpecHash": "ifuWLtYfwrI=",
+  "dgSpecHash": "CfmWjvs7oYc=",
   "success": true,
-  "projectFilePath": "C:\\Users\\user\\insurance_bot\\Car_Insurance_Bot\\Car_Insurance_Bot.csproj",
+  "projectFilePath": "C:\\Users\\user\\insurance_bot\\Car_insurance_bot\\Car_Insurance_Bot.csproj",
   "expectedPackageFiles": [
     "C:\\Users\\user\\.nuget\\packages\\emgu.cv\\4.10.0.5680\\emgu.cv.4.10.0.5680.nupkg.sha512",
     "C:\\Users\\user\\.nuget\\packages\\emgu.cv.runtime.windows\\4.10.0.5680\\emgu.cv.runtime.windows.4.10.0.5680.nupkg.sha512",

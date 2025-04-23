@@ -109,12 +109,6 @@ Thank you for using our service! ❤️
 
 ---
 
-## 🎥 Demo
-
-<video src="assets/demo.mp4" controls width="600"></video>
-
----
-
 ## License
 
 MIT License – see [LICENSE](LICENSE).

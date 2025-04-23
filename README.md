@@ -119,6 +119,6 @@ Thank you for using our service! ❤️
 
 ---
 
-## ✍️ License
+## 📄 License
 
 MIT License

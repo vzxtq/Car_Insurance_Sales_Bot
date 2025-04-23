@@ -1,17 +1,17 @@
 {
   "format": 1,
   "restore": {
-    "C:\\Users\\user\\insurance_bot\\Car_insurance_bot\\Car_Insurance_Bot.csproj": {}
+    "C:\\Users\\user\\insurance_bot\\car_insurance_bot\\Car_Insurance_Bot.csproj": {}
   },
   "projects": {
-    "C:\\Users\\user\\insurance_bot\\Car_insurance_bot\\Car_Insurance_Bot.csproj": {
+    "C:\\Users\\user\\insurance_bot\\car_insurance_bot\\Car_Insurance_Bot.csproj": {
       "version": "1.0.0",
       "restore": {
-        "projectUniqueName": "C:\\Users\\user\\insurance_bot\\Car_insurance_bot\\Car_Insurance_Bot.csproj",
+        "projectUniqueName": "C:\\Users\\user\\insurance_bot\\car_insurance_bot\\Car_Insurance_Bot.csproj",
         "projectName": "Car_Insurance_Bot",
-        "projectPath": "C:\\Users\\user\\insurance_bot\\Car_insurance_bot\\Car_Insurance_Bot.csproj",
+        "projectPath": "C:\\Users\\user\\insurance_bot\\car_insurance_bot\\Car_Insurance_Bot.csproj",
         "packagesPath": "C:\\Users\\user\\.nuget\\packages\\",
-        "outputPath": "C:\\Users\\user\\insurance_bot\\Car_insurance_bot\\obj\\",
+        "outputPath": "C:\\Users\\user\\insurance_bot\\car_insurance_bot\\obj\\",
         "projectStyle": "PackageReference",
         "fallbackFolders": [
           "C:\\Program Files (x86)\\Microsoft Visual Studio\\Shared\\NuGetPackages"
@@ -86,6 +86,10 @@
             "OpenCvSharp4.runtime.win": {
               "target": "Package",
               "version": "[4.10.0.20241108, )"
+            },
+            "Sdcb.OpenCvSharp4.mini.runtime.debian.12-x64": {
+              "target": "Package",
+              "version": "[4.8.0.20231125, )"
             },
             "SixLabors.ImageSharp": {
               "target": "Package",

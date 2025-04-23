@@ -1,0 +1,16 @@
+FROM mcr.microsoft.com/dotnet/sdk:9.0 AS build
+WORKDIR /src
+
+COPY *.csproj .
+RUN dotnet restore
+
+COPY . .  
+RUN dotnet publish -c Release -o /app/publish
+
+FROM mcr.microsoft.com/dotnet/aspnet:9.0
+WORKDIR /app
+COPY --from=build /app/publish .
+
+COPY appsettings.json /app/appsettings.json
+
+ENTRYPOINT ["dotnet", "Car_Insurance_Bot.dll"]

@@ -4,95 +4,73 @@ A Telegram bot that guides users through a car insurance process using OCR, AI-g
 
 ---
 
-## 🚀 Setup Instructions
+## Prerequisites
 
-### 📦 Dependencies
+- .NET 9.0 SDK
+- Docker (optional)
+- Tesseract OCR
+- Telegram Bot Token
+- Google Gemini API Key
 
-Make sure you have the following installed:
+---
 
-- [.NET 9.0 SDK]
-- [Tesseract OCR](https://github.com/tesseract-ocr/tesseract) (ensure `tesseract` is installed and available in your PATH)
-- A valid [Telegram Bot Token]
-- Google Gemini API Key (for chat functionality)
+## Installation
 
-### 🛠 Configuration
-
-1. **Clone the repository:**
-
+1. **Clone the repository**
    ```bash
    git clone https://github.com/vzxtq/Car_Insurance_Sales_Bot.git
+   cd Car_Insurance_Sales_Bot
    ```
-
-2. **Add `appsettings.json`:**
-
-   Create an `appsettings.json` file in the root with your credentials:
-
-   ```json
-   {
-     "Telegram": {
-       "BotToken": "YOUR_TELEGRAM_BOT_TOKEN"
-     },
-     "Gemini": {
-       "ApiKey": "YOUR_GEMINI_API_KEY"
-     },
-     "TesseractDataPath": "YOUR_PATH"
-   }
-   ```
-
-3. **Restore dependencies and run:**
-
+2. **Restore dependencies**
    ```bash
    dotnet restore
-   dotnet run
    ```
 
 ---
 
-## 🤖 Bot Workflow
+## Configuration
 
-The bot guides the user through the insurance process step-by-step:
+Create an `appsettings.json` in the project root:
 
-1. **Start:**
-   - Command: `/start`
-   - Bot explains available options (`/insurance`, `/chat`)
-
-2. **Insurance Flow:**
-   - User sends `/insurance`
-   - Bot asks for a passport photo
-   - Photo is parsed via OCR to extract name and passport number
-   - User confirms extracted data
-   - Bot offers a fixed insurance price (100 USD)
-   - User accepts or declines
-   - If accepted, a generated insurance policy is sent
-
-3. **AI Chat Mode:**
-   - User sends `/chat`
-   - Bot switches to chat mode using Gemini API
+```json
+{
+  "Telegram": { "BotToken": "YOUR_TELEGRAM_BOT_TOKEN" },
+  "GeminiAi": { "ApiKey": "YOUR_GEMINI_API_KEY" },
+  "TesseractDataPath": "PATH_TO_TESSDATA"
+}
+```
 
 ---
 
-## 🔧 Example User Flow
+## Bot Workflow
 
-**User:** /start  
-**Bot:** Welcome! Use /insurance to start or /chat to talk to AI.
+1. **/start**: Presents `/insurance` or `/chat` options.
+2. **/insurance**: Initiates insurance flow.
+3. **/chat**: Switches to AI chat mode.
 
-**User:** /insurance  
+---
+
+## Example User Flow
+
+**User:** `/start`  
+**Bot:** Welcome! Use `/insurance` to start or `/chat` to talk to AI.
+
+**User:** `/insurance`  
 **Bot:** Please send a photo of your passport.
 
-**User:** [uploads image]  
+**User:** *uploads passport image*  
 **Bot:** Extracted info:
 ```
 Name: Ivan Ivanov
 Passport: 123456789
 ```
-Is this correct?
+**Bot:** Is this correct? *(inline buttons Yes / No)*
 
-**User:** [Clicks "Yes"]  
-**Bot:** The insurance price is 100 USD. Do you agree?
+**User:** *clicks Yes*  
+**Bot:** The insurance price is 100 USD. Do you agree? *(Yes / No)*
 
-**User:** [Clicks "Yes"]  
-**Bot:** Thank you! Generating your insurance policy...
-
+**User:** *clicks Yes*  
+**Bot:** Thank you! Generating your insurance policy...  
 **Bot:**
 ```
 ---
@@ -112,15 +90,31 @@ Thank you for using our service! ❤️
 
 ---
 
-## ⚙️ Technologies Used
+## Rejection Scenarios
 
-- C# + .NET
-- Telegram.Bot library
-- Tesseract OCR
-- Google Gemini API
+### Incorrect OCR Extraction
+- **Bot:** "Extracted info... Is this correct?"
+- **User:** clicks **No**
+- **Bot:** "Please send another photo of your passport."  
+  *User resends image → OCR retry*
+
+### Price Disagreement
+- **Bot:** "The insurance price is 100 USD. Do you agree?"
+- **User:** clicks **No**
+- **Bot:** "The price is fixed at 100 USD. Would you like to proceed?"  
+  *(Yes / No)*
+  - **Yes** → proceeds to policy generation.
+  - **No** → "If you change your mind, type /start again. Goodbye."  
+    *Flow ends*
 
 ---
 
-## ✍️ License
+## 🎥 Demo
 
-MIT License
+<video src="assets/demo.mp4" controls width="600"></video>
+
+---
+
+## License
+
+MIT License – see [LICENSE](LICENSE).

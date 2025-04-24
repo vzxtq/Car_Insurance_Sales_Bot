@@ -15,15 +15,12 @@ class Program
         {
             var builder = WebApplication.CreateBuilder(args);
 
-            // load JSON (optional) + ENV
             builder.Configuration
                 .AddJsonFile("appsettings.json", optional: true, reloadOnChange: true)
                 .AddEnvironmentVariables();
 
-            // HttpClient for Gemini, etc.
             builder.Services.AddHttpClient();
 
-            // Telegram client
             builder.Services.AddSingleton<ITelegramBotClient>(sp =>
             {
                 var botToken = builder.Configuration["Telegram:BotToken"];
@@ -36,7 +33,6 @@ class Program
             builder.Services.AddSingleton<UpdateHandler>();
             builder.Services.AddHostedService<BotBackgroundService>();
 
-            // Tesseract
             builder.Services.AddSingleton<TesseractService>(sp =>
             {
                 var tessDataPath = builder.Configuration["TesseractDataPath"];
@@ -51,7 +47,7 @@ class Program
         catch (Exception ex)
         {
             Console.WriteLine("❌ Host terminated unexpectedly.");
-            Console.WriteLine(ex.ToString());    // this prints InnerException too
+            Console.WriteLine(ex.ToString());
             Environment.Exit(1);
         }
     }

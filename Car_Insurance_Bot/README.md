@@ -44,9 +44,8 @@ Create an `appsettings.json` in the project root:
 
 ## Bot Workflow
 
-1. **/start**: Presents `/insurance` or `/chat` options.
-2. **/insurance**: Initiates insurance flow.
-3. **/chat**: Switches to AI chat mode.
+1. **/start**: Presents `/insurance`.
+2. **/insurance**: Initiates insurance flow and dialog with AI.
 
 ---
 

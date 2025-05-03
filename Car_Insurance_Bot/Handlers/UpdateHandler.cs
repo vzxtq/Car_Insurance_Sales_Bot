@@ -15,6 +15,7 @@ namespace Car_Insurance_Bot.Handlers
         private readonly InsuranceService _insuranceService;
         private readonly string? _botToken;
         private readonly TesseractService _tesseractService;
+        private readonly MindeeService _mindeeService;
         private static readonly ConcurrentDictionary<long, (string Name, string Passport)> _userData = new();
         private static readonly ConcurrentDictionary<long, string> _userState = new();
         private readonly GeminiHandler _geminiHandler;
@@ -23,17 +24,18 @@ namespace Car_Insurance_Bot.Handlers
         private readonly CallbackHandler _callbackHandler;
 
         public UpdateHandler(IConfiguration configuration, ITelegramBotClient botClient, 
-                            InsuranceService insuranceService, TesseractService tesseractService)
+                            InsuranceService insuranceService, TesseractService tesseractService, MindeeService mindeeService)
         {
             _botClient = botClient;
             _geminiHandler = new GeminiHandler(configuration);
             _insuranceService = insuranceService;
             _tesseractService = tesseractService;
+            _mindeeService = mindeeService;
             _botToken = configuration["Telegram:BotToken"];
 
             _textMessageHandler = new TextMessageHandler(_botClient, _geminiHandler, _userState);
-            _fileMessageHandler = new FileMessageHandler(_botClient, _tesseractService, _botToken!, _userData, _userState);
-            _callbackHandler = new CallbackHandler(_botClient, _insuranceService, _tesseractService, _userData, _userState);
+            _fileMessageHandler = new FileMessageHandler(_botClient, _tesseractService, _mindeeService, _botToken!, _userData, _userState);
+            _callbackHandler = new CallbackHandler(_botClient, _insuranceService, _tesseractService, _mindeeService, _userData, _userState);
         }
 
         public async Task HandleUpdateAsync(ITelegramBotClient botClient, Update update, CancellationToken ct)

@@ -13,6 +13,7 @@ namespace Car_Insurance_Bot.Handlers
     {
         private readonly ITelegramBotClient _botClient;
         private readonly InsuranceService _insuranceService;
+        private readonly MindeeService _mindeeService;
         private readonly ConcurrentDictionary<long, (string Name, string Passport)> _userData;
         private readonly ConcurrentDictionary<long, string> _userState;
         private readonly MarkDownEscaper _escaper;
@@ -21,11 +22,13 @@ namespace Car_Insurance_Bot.Handlers
             ITelegramBotClient botClient,
             InsuranceService insuranceService,
             TesseractService tesseractService,
+            MindeeService mindeeService,
             ConcurrentDictionary<long, (string Name, string Passport)> userData,
             ConcurrentDictionary<long, string> userState)
         {
             _botClient = botClient;
             _insuranceService = insuranceService;
+            _mindeeService = mindeeService;
             _userData = userData;
             _userState = userState;
             _escaper = new MarkDownEscaper();
@@ -38,20 +41,31 @@ namespace Car_Insurance_Bot.Handlers
 
             switch (data)
             {
-                case "confirm_yes":
-                    _userState[chatId] = "confirmed";
-                    await _botClient.SendTextMessageAsync(chatId, "Data confirmed.");
+                case "confirm_yes_passport":
+                    _userState[chatId] = "awaiting_vin";
+                    await _botClient.SendTextMessageAsync(chatId, "🆗 Passport confirmed.\nNow please send a photo (file) of your car title (VIN).");
+                    break;
+
+                case "confirm_no_passport":
+                    _userState[chatId] = "awaiting_passport";
+                    _userData.TryRemove(chatId, out _);
+                    await _botClient.SendTextMessageAsync(chatId, "❌ Let's try again. Please send another passport image.");
+                    break;
+
+                case "confirm_yes_vin":
+                    _userState[chatId] = "confirmed_vin";
+                    await _botClient.SendTextMessageAsync(chatId, "✅ VIN confirmed.");
                     await PromptPriceConfirmationAsync(chatId);
                     break;
 
-                case "confirm_no":
-                    _userState[chatId] = "confirmed";
+                case "confirm_no_vin":
+                    _userState[chatId] = "awaiting_vin";
                     _userData.TryRemove(chatId, out _);
-                    await _botClient.SendTextMessageAsync(chatId, "Please send another photo of your passport.");
+                    await _botClient.SendTextMessageAsync(chatId, "❌ Let's try again. Please send another car title image.");
                     break;
 
                 case "agree_price":
-                    await _botClient.SendTextMessageAsync(chatId, "Thank you! Generating your insurance policy...");
+                    await _botClient.SendTextMessageAsync(chatId, "🎉 Thank you! Generating your insurance policy...");
                     await Task.Delay(1000);
                     await GenerateAndSendPolicyAsync(chatId);
                     break;
@@ -61,17 +75,17 @@ namespace Car_Insurance_Bot.Handlers
                     break;
 
                 case "final_agree":
-                    await _botClient.SendTextMessageAsync(chatId, "Glad you reconsidered! Generating your policy...");
+                    await _botClient.SendTextMessageAsync(chatId, "🚀 Glad you reconsidered! Generating your policy...");
                     await Task.Delay(1000);
                     await GenerateAndSendPolicyAsync(chatId);
                     break;
 
                 case "final_disagree":
-                    await _botClient.SendTextMessageAsync(chatId, "Thank you for your time. If you change your mind, type /start again. Goodbye.");
+                    await _botClient.SendTextMessageAsync(chatId, "Thank you for your time ❤️ If you change your mind, type /start again. Goodbye.");
                     break;
 
                 default:
-                    await _botClient.SendTextMessageAsync(chatId, "Unknown action.");
+                    await _botClient.SendTextMessageAsync(chatId, "⚠️ Unknown action.");
                     break;
             }
 

@@ -37,6 +37,17 @@ namespace Car_Insurance_Bot.Handlers
                     _userState[chatId] = "awaiting_passport";
                     await _botClient.SendTextMessageAsync(chatId, "🚗 Great! To begin your car insurance process, please send us a clear photo (file) of your passport so we can extract your personal details.");
                     return;
+                
+                case "/cancel":
+                    _userState[chatId] = "cancelled";
+                    _userState.TryRemove(chatId, out _);
+                    await _botClient.SendTextMessageAsync(chatId, "❌ Process cancelled. Type /start to begin again.");
+                    return;
+
+                case "/help":
+                    _userState[chatId] = "help";
+                    await _botClient.SendTextMessageAsync(chatId, "🆘 Help: Type /start to begin the process or /insurance to send your passport. For any other questions, just ask!");
+                    return;
             }
 
             if (!_userState.TryGetValue(chatId, out var state))
@@ -52,7 +63,7 @@ namespace Car_Insurance_Bot.Handlers
                     var explanation = await _geminiHandler.SendToGeminiAsync(prompt);
                     await _botClient.SendTextMessageAsync(chatId, explanation);
                     break;
-
+                
                 case "awaiting_confirm":
                     var confPrompt = $"User is reviewing the extracted personal data from their document. They asked: '{message.Text}'. Provide a brief and clear response encouraging them to confirm or correct the data.";
                     var confReply = await _geminiHandler.SendToGeminiAsync(confPrompt);

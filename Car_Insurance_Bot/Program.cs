@@ -30,7 +30,6 @@ class Program
             });
 
             builder.Services.AddSingleton<InsuranceService>();
-            builder.Services.AddSingleton<UpdateHandler>();
             builder.Services.AddHostedService<BotBackgroundService>();
 
             builder.Services.AddSingleton<TesseractService>(sp =>
@@ -40,6 +39,16 @@ class Program
                     throw new ArgumentNullException("TesseractDataPath", "Tesseract data path is missing.");
                 return new TesseractService(tessDataPath);
             });
+
+            builder.Services.AddSingleton<MindeeService>(sp =>
+            {
+                var apiKey = builder.Configuration["Mindee:ApiKey"];
+                if (string.IsNullOrEmpty(apiKey))
+                    throw new ArgumentNullException("Mindee:ApiKey", "Mindee API key is missing.");
+                return new MindeeService(apiKey);
+            });
+
+            builder.Services.AddSingleton<UpdateHandler>();
 
             var app = builder.Build();
             app.Run();

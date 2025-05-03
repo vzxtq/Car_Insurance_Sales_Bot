@@ -4,12 +4,16 @@ using Telegram.Bot.Types.ReplyMarkups;
 using Car_Insurance_Bot.Services;
 using System.Collections.Concurrent;
 using Car_Insurance_Bot.Utils;
+using System.Diagnostics.CodeAnalysis;
+using OpenAI.Chat;
+using System.Diagnostics;
 
 namespace Car_Insurance_Bot.Handlers
 {
     public class FileMessageHandler
     {
         private readonly ITelegramBotClient _botClient;
+        private readonly MindeeService _mindeeService;
         private readonly TesseractService _tesseractService;
         private readonly string _botToken;
         private readonly ConcurrentDictionary<long, (string Name, string Passport)> _userData;
@@ -18,12 +22,14 @@ namespace Car_Insurance_Bot.Handlers
         public FileMessageHandler(
             ITelegramBotClient botClient,
             TesseractService tesseractService,
+            MindeeService mindeeService,
             string botToken,
             ConcurrentDictionary<long, (string Name, string Passport)> userData,
             ConcurrentDictionary<long, string> userState)
         {
             _botClient = botClient;
             _tesseractService = tesseractService;
+            _mindeeService = mindeeService;
             _botToken = botToken;
             _userData = userData;
             _userState = userState;
@@ -31,7 +37,7 @@ namespace Car_Insurance_Bot.Handlers
 
         public async Task HandleAsync(Message message, long chatId)
         {
-            if (!_userState.ContainsKey(chatId))
+            if (!_userState.TryGetValue(chatId, out var currentState))
             {
                 await _botClient.SendTextMessageAsync(chatId, "Please type /start to begin the process.");
                 return;
@@ -39,65 +45,102 @@ namespace Car_Insurance_Bot.Handlers
 
             if (message.Document == null)
             {
-                await _botClient.SendTextMessageAsync(chatId, "No document found. Please send a valid file.");
+                await _botClient.SendTextMessageAsync(chatId, "Please send a valid image file.");
                 return;
             }
 
-            var mimeType = message.Document.MimeType?.ToLower();
-            var fileName = message.Document.FileName?.ToLower();
-            var isImage = mimeType?.StartsWith("image/") == true || fileName?.EndsWith(".jpg") == true || fileName.EndsWith(".jpeg") || fileName.EndsWith(".png");
-
-            if (!isImage)
+            if (!IsImageFile(message.Document))
             {
-                await _botClient.SendTextMessageAsync(chatId, "Unsupported file type. Please send a photo (JPG, JPEG, PNG) of your passport.");
+                await _botClient.SendTextMessageAsync(chatId, "Unsupported file type. Please send a JPG, JPEG, or PNG image.");
                 return;
             }
 
-            if (_userState.TryGetValue(chatId, out var state) && state == "awaiting_confirm")
+            var fileUrl = await _botClient.GetFileAsync(message.Document.FileId);
+            var downloadedPath = await DownloadFileAsync(fileUrl.FilePath);
+
+            try
             {
-                await _botClient.SendTextMessageAsync(chatId, "Please confirm the previous document before sending a new one.");
-                return;
-            }
-
-            var fileId = message.Document.FileId;
-            var file = await _botClient.GetFileAsync(fileId);
-            var filePath = file.FilePath;
-            var fileUrl = $"https://api.telegram.org/file/bot{_botToken}/{filePath}";
-            var downloadedFilePath = await DownloadFileAsync(fileUrl);
-
-            await _botClient.SendTextMessageAsync(chatId, "Document received. Processing...");
-
-            var (name, passport) = await _tesseractService.ParsePassport(downloadedFilePath);
-
-            _userData[chatId] = (name, passport);
-            _userState[chatId] = "awaiting_confirm";
-
-            string extractedInfo = $"Name: {name}\nPassport: {passport}";
-
-            var confirmKeyboard = new InlineKeyboardMarkup(new[]
-            {
-                new[]
+                switch (currentState)
                 {
-                    InlineKeyboardButton.WithCallbackData("Yes", "confirm_yes"),
-                    InlineKeyboardButton.WithCallbackData("No", "confirm_no")
-                }
-            });
+                    case "awaiting_passport":
+                        await ProcessPassportAsync(chatId, downloadedPath);
+                        break;
+                    
+                    case "awaiting_vin":
+                        await ProcessVinAsync(chatId, downloadedPath);
+                        break;
 
-            await _botClient.SendTextMessageAsync(chatId,
-                $"Extracted data:\n{extractedInfo}\n\nIs this correct?",
-                replyMarkup: confirmKeyboard);
+                    default:
+                        await _botClient.SendTextMessageAsync(chatId, "⚠️ Unexpected document. Please follow the instructions.");
+                        break;
+                }
+            }
+
+            finally
+            {
+                try {System.IO.File.Delete(downloadedPath); } 
+                catch (Exception ex) {Console.WriteLine($"[ERROR] Failed to delete file: {ex.Message}");}
+            }
         }
 
-        private async Task<string> DownloadFileAsync(string fileUrl)
+        private bool IsImageFile(Document document)
         {
-            var httpClient = new HttpClient();
-            var response = await httpClient.GetAsync(fileUrl);
+            var mime = document.MimeType?.ToLower();
+            var name = document.FileName?.ToLower();
+            return mime?.StartsWith("image/") == true ||
+                   name?.EndsWith(".jpg") == true || name.EndsWith(".jpeg") || name.EndsWith(".png");
+        }
+
+        private async Task ProcessPassportAsync (long chatId, string path)
+        {
+            await _botClient.SendTextMessageAsync(chatId, "🔍 Processing your passport image... Please wait.");
+
+            var (name, passport) = await _tesseractService.ParsePassport(path);
+            _userData[chatId] = (name, passport);
+            _userState[chatId] = "awaiting_passport";
+
+            var confirmButtons = new InlineKeyboardMarkup(new[]
+            {
+                InlineKeyboardButton.WithCallbackData("Confirm", "confirm_yes_passport"),
+                InlineKeyboardButton.WithCallbackData("Incorrect", "confirm_no_passport")
+            });
+
+            await _botClient.SendTextMessageAsync(chatId, $"👤 Name: {name}\n🆔 Passport: {passport}\n\nCorrect?", replyMarkup: confirmButtons);
+        }
+
+        private async Task ProcessVinAsync(long chatId, string path)
+        {
+            await _botClient.SendTextMessageAsync(chatId, "🔍 Processing your VIN image... Please wait.");
+
+            var vin = await _mindeeService.ProcessDocumentAsync(path);
+            _userState[chatId] = "awaiting_vin";
+
+            var confirmButtons = new InlineKeyboardMarkup(new[]
+            {
+                InlineKeyboardButton.WithCallbackData("Confirm", "confirm_yes_vin"),
+                InlineKeyboardButton.WithCallbackData("Incorrect", "confirm_no_vin")
+            });
+            if (string.IsNullOrEmpty(vin))
+            {
+                await _botClient.SendTextMessageAsync(chatId, "❌ VIN not found. Please send a clear image of your car title.");
+                return;
+            }
+
+            await _botClient.SendTextMessageAsync(chatId, $"🚗 VIN: {vin}\n\nCorrect?", replyMarkup: confirmButtons);
+        }
+
+        private async Task<string> DownloadFileAsync(string filePath)
+        {
+            var fullUrl = $"https://api.telegram.org/file/bot{_botToken}/{filePath}";
+
+            using var httpClient = new HttpClient();
+            var response = await httpClient.GetAsync(fullUrl);
             if (response.IsSuccessStatusCode)
             {
                 var fileCont = await response.Content.ReadAsByteArrayAsync();
-                var filePath = Path.Combine(Path.GetTempPath(), Guid.NewGuid() + ".jpg");
-                await System.IO.File.WriteAllBytesAsync(filePath, fileCont);
-                return filePath;
+                var localPath = Path.Combine(Path.GetTempPath(), Guid.NewGuid() + ".jpg");
+                await System.IO.File.WriteAllBytesAsync(localPath, fileCont);
+                return localPath;
             }
 
             throw new Exception("Failed to download file.");

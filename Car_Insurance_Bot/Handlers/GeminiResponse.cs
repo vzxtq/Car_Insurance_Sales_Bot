@@ -12,7 +12,7 @@ namespace Car_Insurance_Bot.Handlers
 
         public GeminiHandler(IConfiguration configuration)
         {
-            _geminiApiKey = configuration["GeminiAi:ApiKey"];
+            _geminiApiKey = configuration["GeminiAi:ApiKey"] ?? throw new ArgumentNullException("GeminiAi:ApiKey", "API key cannot be null.");
             _httpClient = new HttpClient();
         }
 

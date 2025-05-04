@@ -14,21 +14,21 @@ namespace Car_Insurance_Bot.Handlers
     {
         private readonly ITelegramBotClient _botClient;
         private readonly MindeeService _mindeeService;
-        private readonly TesseractService _tesseractService;
+        private readonly MindeePassportService _mindeePassportService;
         private readonly string _botToken;
         private readonly ConcurrentDictionary<long, (string Name, string Passport)> _userData;
         private readonly ConcurrentDictionary<long, string> _userState;
 
         public FileMessageHandler(
             ITelegramBotClient botClient,
-            TesseractService tesseractService,
+            MindeePassportService mindeePassportSerivice,
             MindeeService mindeeService,
             string botToken,
             ConcurrentDictionary<long, (string Name, string Passport)> userData,
             ConcurrentDictionary<long, string> userState)
         {
             _botClient = botClient;
-            _tesseractService = tesseractService;
+            _mindeePassportService = mindeePassportSerivice;
             _mindeeService = mindeeService;
             _botToken = botToken;
             _userData = userData;
@@ -39,19 +39,19 @@ namespace Car_Insurance_Bot.Handlers
         {
             if (!_userState.TryGetValue(chatId, out var currentState))
             {
-                await _botClient.SendTextMessageAsync(chatId, "Please type /start to begin the process.");
+                await _botClient.SendTextMessageAsync(chatId, "Please type /start to begin the process");
                 return;
             }
 
             if (message.Document == null)
             {
-                await _botClient.SendTextMessageAsync(chatId, "Please send a valid image file.");
+                await _botClient.SendTextMessageAsync(chatId, "⚠️ Please send a valid image file");
                 return;
             }
 
             if (!IsImageFile(message.Document))
             {
-                await _botClient.SendTextMessageAsync(chatId, "Unsupported file type. Please send a JPG, JPEG, or PNG image.");
+                await _botClient.SendTextMessageAsync(chatId, "⚠️ Unsupported file type.\n\nPlease send a JPG, JPEG, or PNG image");
                 return;
             }
 
@@ -95,8 +95,8 @@ namespace Car_Insurance_Bot.Handlers
         {
             await _botClient.SendTextMessageAsync(chatId, "🔍 Processing your passport image... Please wait.");
 
-            var (name, passport) = await _tesseractService.ParsePassport(path);
-            _userData[chatId] = (name, passport);
+            var (fullname, idNumber) = await _mindeePassportService.ProcessPassportAsync(path);
+            _userData[chatId] = (fullname, idNumber);
             _userState[chatId] = "awaiting_passport";
 
             var confirmButtons = new InlineKeyboardMarkup(new[]
@@ -105,7 +105,7 @@ namespace Car_Insurance_Bot.Handlers
                 InlineKeyboardButton.WithCallbackData("Incorrect", "confirm_no_passport")
             });
 
-            await _botClient.SendTextMessageAsync(chatId, $"👤 Name: {name}\n🆔 Passport: {passport}\n\nCorrect?", replyMarkup: confirmButtons);
+            await _botClient.SendTextMessageAsync(chatId, $"👤 Name: {fullname}\n🆔 Passport: {idNumber}\n\nCorrect?", replyMarkup: confirmButtons);
         }
 
         private async Task ProcessVinAsync(long chatId, string path)

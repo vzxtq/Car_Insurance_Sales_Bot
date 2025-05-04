@@ -13,7 +13,9 @@ namespace Car_Insurance_Bot.Services
         public MindeeService(string apiKey)
         {
             if (string.IsNullOrEmpty(apiKey))
-                throw new ArgumentNullException(nameof(apiKey), "Mindee API key is missing.");
+            {
+                throw new ArgumentNullException(nameof(apiKey), "Mindee API key is missing.");  
+            }
 
             _mindeeClient = new MindeeClient(apiKey);
         }
@@ -35,27 +37,27 @@ namespace Car_Insurance_Bot.Services
 
             if (response == null)
             {
-                throw new Exception("Response is null.");
+                throw new Exception("Mindee Vin Service response is null.");
             }
 
             if (response.Document == null)
             {
-                throw new Exception("Document is null.");
+                throw new Exception("Mindee Vin Service document is null.");
             }
 
             if (response.Document.Inference == null)
             {
-                throw new Exception("Inference is null.");
+                throw new Exception("Mindee Vin Service inference is null.");
             }
 
             if (response.Document.Inference.Prediction == null)
             {
-                throw new Exception("Prediction is null.");
+                throw new Exception("Mindee Vin Service prediction is null.");
             }
 
             if (response.Document.Inference.Prediction.Fields == null)
             {
-                throw new Exception("Fields are null.");
+                throw new Exception("Mindee Vin Service fields are null.");
             }
 
             if (response.Document.Inference.Prediction.Fields.TryGetValue("vin", out var vinField))

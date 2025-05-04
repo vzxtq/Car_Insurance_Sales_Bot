@@ -21,7 +21,7 @@ namespace Car_Insurance_Bot.Handlers
         public CallbackHandler(
             ITelegramBotClient botClient,
             InsuranceService insuranceService,
-            TesseractService tesseractService,
+            MindeePassportService mindeePassportService,
             MindeeService mindeeService,
             ConcurrentDictionary<long, (string Name, string Passport)> userData,
             ConcurrentDictionary<long, string> userState)
@@ -43,25 +43,25 @@ namespace Car_Insurance_Bot.Handlers
             {
                 case "confirm_yes_passport":
                     _userState[chatId] = "awaiting_vin";
-                    await _botClient.SendTextMessageAsync(chatId, "🆗 Passport confirmed.\nNow please send a photo (file) of your car title (VIN).");
+                    await _botClient.SendTextMessageAsync(chatId, "🆗 Passport confirmed.\nNow please send a photo (file) of your car title (VIN)");
                     break;
 
                 case "confirm_no_passport":
                     _userState[chatId] = "awaiting_passport";
                     _userData.TryRemove(chatId, out _);
-                    await _botClient.SendTextMessageAsync(chatId, "❌ Let's try again. Please send another passport image.");
+                    await _botClient.SendTextMessageAsync(chatId, "❌ Let's try again. Please send another passport image");
                     break;
 
                 case "confirm_yes_vin":
                     _userState[chatId] = "confirmed_vin";
-                    await _botClient.SendTextMessageAsync(chatId, "✅ VIN confirmed.");
+                    await _botClient.SendTextMessageAsync(chatId, "✅ VIN confirmed");
                     await PromptPriceConfirmationAsync(chatId);
                     break;
 
                 case "confirm_no_vin":
                     _userState[chatId] = "awaiting_vin";
                     _userData.TryRemove(chatId, out _);
-                    await _botClient.SendTextMessageAsync(chatId, "❌ Let's try again. Please send another car title image.");
+                    await _botClient.SendTextMessageAsync(chatId, "❌ Let's try again. Please send another car title image");
                     break;
 
                 case "agree_price":
@@ -81,11 +81,11 @@ namespace Car_Insurance_Bot.Handlers
                     break;
 
                 case "final_disagree":
-                    await _botClient.SendTextMessageAsync(chatId, "Thank you for your time ❤️ If you change your mind, type /start again. Goodbye.");
+                    await _botClient.SendTextMessageAsync(chatId, "Thank you for your time ❤️ If you change your mind, type /start again. Goodbye");
                     break;
 
                 default:
-                    await _botClient.SendTextMessageAsync(chatId, "⚠️ Unknown action.");
+                    await _botClient.SendTextMessageAsync(chatId, "⚠️ Unknown action");
                     break;
             }
 
@@ -122,7 +122,7 @@ namespace Car_Insurance_Bot.Handlers
         {
             if (!_userData.TryGetValue(chatId, out var userInfo))
             {
-                await _botClient.SendTextMessageAsync(chatId, "User data not found. Please /start again.");
+                await _botClient.SendTextMessageAsync(chatId, "User data not found. Please /start again");
                 return;
             }
 

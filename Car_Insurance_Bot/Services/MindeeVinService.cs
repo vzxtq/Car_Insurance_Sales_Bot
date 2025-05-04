@@ -35,31 +35,6 @@ namespace Car_Insurance_Bot.Services
             var response = await _mindeeClient
                 .EnqueueAndParseAsync<GeneratedV1>(inputSource, endpoint);
 
-            if (response == null)
-            {
-                throw new Exception("Mindee Vin Service response is null.");
-            }
-
-            if (response.Document == null)
-            {
-                throw new Exception("Mindee Vin Service document is null.");
-            }
-
-            if (response.Document.Inference == null)
-            {
-                throw new Exception("Mindee Vin Service inference is null.");
-            }
-
-            if (response.Document.Inference.Prediction == null)
-            {
-                throw new Exception("Mindee Vin Service prediction is null.");
-            }
-
-            if (response.Document.Inference.Prediction.Fields == null)
-            {
-                throw new Exception("Mindee Vin Service fields are null.");
-            }
-
             if (response.Document.Inference.Prediction.Fields.TryGetValue("vin", out var vinField))
             {
                 var raw = vinField.ToString();

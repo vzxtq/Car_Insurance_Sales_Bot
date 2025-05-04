@@ -6,6 +6,7 @@ using Car_Insurance_Bot.Utils;
 using System.Collections.Concurrent;
 using System.Threading.Tasks;
 using Telegram.Bot.Types.Enums;
+using System.Reflection;
 
 namespace Car_Insurance_Bot.Handlers
 {
@@ -43,13 +44,13 @@ namespace Car_Insurance_Bot.Handlers
             {
                 case "confirm_yes_passport":
                     _userState[chatId] = "awaiting_vin";
-                    await _botClient.SendTextMessageAsync(chatId, "🆗 Passport confirmed.\nNow please send a photo (file) of your car title (VIN)");
+                    await _botClient.SendTextMessageAsync(chatId, "🆗 Passport confirmed.\nNow please send a photo (file) of your Car Title (VIN)");
                     break;
 
                 case "confirm_no_passport":
                     _userState[chatId] = "awaiting_passport";
                     _userData.TryRemove(chatId, out _);
-                    await _botClient.SendTextMessageAsync(chatId, "❌ Let's try again. Please send another passport image");
+                    await _botClient.SendTextMessageAsync(chatId, "❌ Let's try again. Please send another Passport image");
                     break;
 
                 case "confirm_yes_vin":
@@ -61,7 +62,7 @@ namespace Car_Insurance_Bot.Handlers
                 case "confirm_no_vin":
                     _userState[chatId] = "awaiting_vin";
                     _userData.TryRemove(chatId, out _);
-                    await _botClient.SendTextMessageAsync(chatId, "❌ Let's try again. Please send another car title image");
+                    await _botClient.SendTextMessageAsync(chatId, "❌ Let's try again. Please send another Car Title image (file)");
                     break;
 
                 case "agree_price":

@@ -7,5 +7,3 @@ VIN: {VIN}
 Insurance Type: Car
 Price: 100 USD
 Status: Active
-
-Thank you for using our service! ❤️

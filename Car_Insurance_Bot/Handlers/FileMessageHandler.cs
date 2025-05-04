@@ -93,7 +93,7 @@ namespace Car_Insurance_Bot.Handlers
 
         private async Task ProcessPassportAsync (long chatId, string path)
         {
-            await _botClient.SendTextMessageAsync(chatId, "🔍 Processing your passport image... Please wait.");
+            await _botClient.SendTextMessageAsync(chatId, "🔍 Processing your Passport image... Please wait.");
 
             var (fullname, idNumber) = await _mindeePassportService.ProcessPassportAsync(path);
             _userData[chatId] = (fullname, idNumber);
@@ -105,12 +105,12 @@ namespace Car_Insurance_Bot.Handlers
                 InlineKeyboardButton.WithCallbackData("Incorrect", "confirm_no_passport")
             });
 
-            await _botClient.SendTextMessageAsync(chatId, $"👤 Name: {fullname}\n🆔 Passport: {idNumber}\n\nCorrect?", replyMarkup: confirmButtons);
+            await _botClient.SendTextMessageAsync(chatId, $"Name: {fullname}\nId Number: {idNumber}\n\nCorrect?", replyMarkup: confirmButtons);
         }
 
         private async Task ProcessVinAsync(long chatId, string path)
         {
-            await _botClient.SendTextMessageAsync(chatId, "🔍 Processing your VIN image... Please wait.");
+            await _botClient.SendTextMessageAsync(chatId, "🔍 Processing your Car Title image... Please wait.");
 
             var vin = await _mindeeService.ProcessDocumentAsync(path);
             _userState[chatId] = "awaiting_vin";
@@ -122,11 +122,11 @@ namespace Car_Insurance_Bot.Handlers
             });
             if (string.IsNullOrEmpty(vin))
             {
-                await _botClient.SendTextMessageAsync(chatId, "❌ VIN not found. Please send a clear image of your car title.");
+                await _botClient.SendTextMessageAsync(chatId, "❌ VIN not found. Please send a clear image of your Car Title.");
                 return;
             }
 
-            await _botClient.SendTextMessageAsync(chatId, $"🚗 VIN: {vin}\n\nCorrect?", replyMarkup: confirmButtons);
+            await _botClient.SendTextMessageAsync(chatId, $"VIN: {vin}\n\nCorrect?", replyMarkup: confirmButtons);
         }
 
         private async Task<string> DownloadFileAsync(string filePath)

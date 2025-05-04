@@ -49,14 +49,14 @@ namespace Car_Insurance_Bot.Handlers
                 return;
                 
                 case "/cancel":
-                    _userState[chatId] = "cancelled";
+                    _userState[chatId] = "idle";
                     _userState.TryRemove(chatId, out _);
                     await _botClient.SendTextMessageAsync(chatId, "❌ The insurance process has been cancelled.\nTo restart, please type /start at any time");
                     return;
 
                 case "/help":
-                    _userState[chatId] = "help";
-                    await _botClient.SendTextMessageAsync(chatId, "🆘 Help Menu\n\n• /start — Begin the car insurance process\n• /cancel — Cancel the current process\n\nIf you have any questions, feel free to type them directly here");
+                    _userState[chatId] = "awaiting_passport";
+                    await _botClient.SendTextMessageAsync(chatId, "Help Menu\n\n/cancel — Cancel the current process \n\n🤖 You may also ask questions at any time. Our AI assistant is here to support you throughout the application");
                     return;
             }
 
@@ -66,32 +66,24 @@ namespace Car_Insurance_Bot.Handlers
                 return;
             }
 
-            switch (state)
+            string prompt;
+            switch(state)
             {
                 case "awaiting_passport":
-                    var prompt = $"User is in insurance flow, passport not yet provided. They ask: '{message.Text}'. Explain why passport photo is needed and guide them.";
-                    var explanation = await _geminiHandler.SendToGeminiAsync(prompt);
-                    await _botClient.SendTextMessageAsync(chatId, explanation);
+                    prompt = $"The user is in the insurance flow and has not uploaded a passport yet. They asked: '{message.Text}'. Explain why the passport photo is needed for insurance in a friendly and clear way.";
                     break;
                 
-                case "awaiting_confirm":
-                    var confPrompt = $"User is reviewing the extracted personal data from their document. They asked: '{message.Text}'. Provide a brief and clear response encouraging them to confirm or correct the data.";
-                    var confReply = await _geminiHandler.SendToGeminiAsync(confPrompt);
-                    await _botClient.SendTextMessageAsync(chatId, confReply);
+                case "awaiting_vin":
+                    prompt = $"The user is in the VIN stage and asked: '{message.Text}'. Explain why the VIN is required and how to properly photograph the VIN document.";
                     break;
-
-                case "confirmed":
-                    var pricePrompt = $"User is reviewing price agreement. They ask: '{message.Text}'. Persuade them on the benefits of insurance and price fairness.";
-                    var priceReply = await _geminiHandler.SendToGeminiAsync(pricePrompt);
-                    await _botClient.SendTextMessageAsync(chatId, priceReply);
-                    break;
-
+                
                 default:
-                    var defaultPrompt = $"User in state '{state}' asks: '{message.Text}'. Respond briefly, stay on topic, and be helpful.";
-                    var reply = await _geminiHandler.SendToGeminiAsync(defaultPrompt);
-                    await _botClient.SendTextMessageAsync(chatId, reply);
+                    prompt = $"The user is in state '{state}' and asked: '{message.Text}'. Reply briefly, helpfully, and in context.";
                     break;
             }
+
+            var reply = await _geminiHandler.SendToGeminiAsync(prompt);
+            await _botClient.SendTextMessageAsync(chatId, reply);
         }
     }
 }

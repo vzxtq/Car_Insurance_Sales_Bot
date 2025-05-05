@@ -13,7 +13,7 @@ using System.Reflection;
 [assembly: System.Reflection.AssemblyCompanyAttribute("Car_Insurance_Bot")]
 [assembly: System.Reflection.AssemblyConfigurationAttribute("Debug")]
 [assembly: System.Reflection.AssemblyFileVersionAttribute("1.0.0.0")]
-[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+42cc9a1fb516ab9b2673004ae1fec453f789aa9e")]
+[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+0533ff1778aac57ff25bd888384c8cce5d848a16")]
 [assembly: System.Reflection.AssemblyProductAttribute("Car_Insurance_Bot")]
 [assembly: System.Reflection.AssemblyTitleAttribute("Car_Insurance_Bot")]
 [assembly: System.Reflection.AssemblyVersionAttribute("1.0.0.0")]

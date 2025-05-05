@@ -48,7 +48,7 @@ namespace Car_Insurance_Bot.Handlers
             {
                 case "confirm_yes_passport":
                     _userState[chatId] = "awaiting_vin";
-                    await _botClient.SendTextMessageAsync(chatId, "🆗 Passport confirmed.\n\nNow please send a photo (as a file) of your Car Title");
+                    await _botClient.SendTextMessageAsync(chatId, "🆗 Passport confirmed.\n\nNow please send a photo of your Car Title");
                     
                     await _botClient.EditMessageReplyMarkupAsync(chatId: chatId, messageId: callbackQuery.Message.MessageId, replyMarkup: null);
                     
@@ -58,7 +58,7 @@ namespace Car_Insurance_Bot.Handlers
                     _userState[chatId] = "awaiting_passport";
                     _userPassportData.TryRemove(chatId, out _);
 
-                    await _botClient.SendTextMessageAsync(chatId, "❌ Let's try again. Please send another Passport image (as a file)");
+                    await _botClient.SendTextMessageAsync(chatId, "❌ Let's try again. Please send another Passport image");
                     
                     await _botClient.EditMessageReplyMarkupAsync(chatId: chatId, messageId: callbackQuery.Message.MessageId, replyMarkup: null);
 
@@ -77,7 +77,7 @@ namespace Car_Insurance_Bot.Handlers
                     _userState[chatId] = "awaiting_vin";
                     _userVinData.TryRemove(chatId, out _);
 
-                    await _botClient.SendTextMessageAsync(chatId, "❌ Let's try again. Please send another Car Title image (as a file)");
+                    await _botClient.SendTextMessageAsync(chatId, "❌ Let's try again. Please send another Car Title image");
                     
                     await _botClient.EditMessageReplyMarkupAsync(chatId: chatId, messageId: callbackQuery.Message.MessageId, replyMarkup: null);
 

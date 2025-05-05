@@ -39,13 +39,18 @@ namespace Car_Insurance_Bot.Handlers
                     if (userInput == "/start")
                     {
                         _userState[chatId] = "idle";
-                        await _botClient.SendTextMessageAsync(chatId, "👋 Welcome to the Car Insurance Assistant.\n\nTo begin the vehicle insurance application process, please type /insurance");
+                        await _botClient.SendTextMessageAsync(chatId,
+                            "👋 Welcome to the Car Insurance Assistant!\n\n" +
+                            "To apply for your vehicle insurance, you'll need to upload:\n" +
+                            "📄 A photo of your passport\n" +
+                            "🚗 And a photo of your car title (showing the VIN number)\n\n" +
+                            "To begin, type /insurance");                        
                         await _botClient.SendTextMessageAsync(chatId, "ℹ️ If you need help at any point, type /help");
                     }
                     else if (userInput == "/insurance")
                     {
                         _userState[chatId] = "awaiting_passport";
-                        await _botClient.SendTextMessageAsync(chatId, "📄 Please upload a clear image of your passport (as a file).\nThis is required to extract your personal information for the insurance contract");
+                        await _botClient.SendTextMessageAsync(chatId, "📄 Please upload a clear image of your passport.\nThis is required to extract your personal information for the insurance contract");
                     }
                 return;
                 

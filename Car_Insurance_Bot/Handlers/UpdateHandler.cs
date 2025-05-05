@@ -49,7 +49,7 @@ namespace Car_Insurance_Bot.Handlers
                 {
                     await _textMessageHandler.HandleAsync(message, chatId);
                 }
-                else if (message.Type == MessageType.Document)
+                else if (message.Type == MessageType.Document || message.Type == MessageType.Photo)
                 {
                     await _fileMessageHandler.HandleAsync(message, chatId);
                 }

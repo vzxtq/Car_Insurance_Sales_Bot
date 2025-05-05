@@ -61,10 +61,13 @@ Create an `appsettings.json` in the project root:
 ## Example User Flow
 
 **User:** `/start`  
-**Bot:**👋 Welcome to the Car Insurance Assistant. To begin the vehicle insurance application process, please type /insurance
+**Bot:** "👋 Welcome to the Car Insurance Assistant! To apply for your vehicle insurance, you'll need to upload:
+          📄 A photo of your passport 
+          🚗 And a photo of your car title (showing the VIN number)
+          To begin, type /insurance                       
 
 **User:** `/insurance`  
-**Bot:** 📄 Please upload a clear image of your passport (as a file). This is required to extract your personal information for the insurance contract
+**Bot:** 📄 Please upload a clear image of your passport. This is required to extract your personal information for the insurance contract
 
 **User:** *uploads Passport image*  
 **Bot:** Extracted info:
@@ -75,7 +78,7 @@ Passport: 340003955
 **Bot:** Correct? *(Confirm / Incorrect)*
 
 **User:** *clicks Confirm*
-**Bot:** 🆗 Passport confirmed. Now please send a photo (file) of your Car Title (VIN)
+**Bot:** 🆗 Passport confirmed. Now please send a photo of your Car Title (VIN)
 
 **User:** *uploads Car Title image*
 **Bot:** Extracted info:

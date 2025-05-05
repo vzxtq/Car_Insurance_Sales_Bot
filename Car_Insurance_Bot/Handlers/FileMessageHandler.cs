@@ -46,23 +46,41 @@ namespace Car_Insurance_Bot.Handlers
                 return;
             }
 
-            if (message.Document == null)
-            {
-                await _botClient.SendTextMessageAsync(chatId, "⚠️ Please send a valid image file");
-                return;
-            }
+            string downloadedPath = null;
 
-            if (!IsImageFile(message.Document))
+            try 
             {
-                await _botClient.SendTextMessageAsync(chatId, "⚠️ Unsupported file type.\n\nPlease send a JPG, JPEG, or PNG image");
-                return;
-            }
+                if (message.Document != null && IsImageFile(message.Document))
+                {
+                    var fileUrl = await _botClient.GetFileAsync(message.Document.FileId);
+                    if (fileUrl.FilePath != null)
+                    {
+                        downloadedPath = await DownloadFileAsync(fileUrl.FilePath);
+                    }
+                    else
+                    {
+                        throw new Exception("File path is null.");
+                    }
+                }
+                else if (message.Photo != null && message.Photo.Any())
+                {
+                    var photo = message.Photo.OrderByDescending(p => p.FileSize).First();
+                    var fileUrl = await _botClient.GetFileAsync(photo.FileId);
+                    if (fileUrl.FilePath != null)
+                    {
+                        downloadedPath = await DownloadFileAsync(fileUrl.FilePath);
+                    }
+                    else
+                    {
+                        throw new Exception("Photo file path is null.");
+                    }
+                }
+                else
+                {
+                    await _botClient.SendTextMessageAsync(chatId, "⚠️ Please send a valid image (JPG, PNG) or document file.");
+                    return;
+                }
 
-            var fileUrl = await _botClient.GetFileAsync(message.Document.FileId);
-            var downloadedPath = await DownloadFileAsync(fileUrl.FilePath);
-
-            try
-            {
                 switch (currentState)
                 {
                     case "awaiting_passport":

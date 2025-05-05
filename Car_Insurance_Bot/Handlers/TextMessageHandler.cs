@@ -49,8 +49,8 @@ namespace Car_Insurance_Bot.Handlers
                 return;
                 
                 case "/cancel":
-                    _userState[chatId] = "idle";
                     _userState.TryRemove(chatId, out _);
+                    _userState[chatId] = "idle";
                     await _botClient.SendTextMessageAsync(chatId, "❌ The insurance process has been cancelled.\nTo restart, please type /start at any time");
                     return;
 
@@ -75,6 +75,10 @@ namespace Car_Insurance_Bot.Handlers
                 
                 case "awaiting_vin":
                     prompt = $"The user is in the VIN stage and asked: '{message.Text}'. Explain why the VIN is required and how to properly photograph the VIN document.";
+                    break;
+                
+                case "completed":
+                    prompt = $"The insurance process is complete and the policy has been generated. The user asked: '{message.Text}'. Respond helpfully and briefly, assuming they may have questions about their policy, coverage, changes, or next steps.";
                     break;
                 
                 default:

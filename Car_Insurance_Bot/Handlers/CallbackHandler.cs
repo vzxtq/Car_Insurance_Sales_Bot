@@ -44,39 +44,59 @@ namespace Car_Insurance_Bot.Handlers
             {
                 case "confirm_yes_passport":
                     _userState[chatId] = "awaiting_vin";
-                    await _botClient.SendTextMessageAsync(chatId, "🆗 Passport confirmed.\nNow please send a photo (file) of your Car Title (VIN)");
+                    await _botClient.SendTextMessageAsync(chatId, "🆗 Passport confirmed.\n\nNow please send a photo (as a file) of your Car Title");
+                    
+                    await _botClient.EditMessageReplyMarkupAsync(chatId: chatId, messageId: callbackQuery.Message.MessageId, replyMarkup: null);
+                    
                     break;
 
                 case "confirm_no_passport":
                     _userState[chatId] = "awaiting_passport";
                     _userData.TryRemove(chatId, out _);
-                    await _botClient.SendTextMessageAsync(chatId, "❌ Let's try again. Please send another Passport image");
+                    await _botClient.SendTextMessageAsync(chatId, "❌ Let's try again. Please send another Passport image (as a file)");
+                    
+                    await _botClient.EditMessageReplyMarkupAsync(chatId: chatId, messageId: callbackQuery.Message.MessageId, replyMarkup: null);
+
                     break;
 
                 case "confirm_yes_vin":
                     _userState[chatId] = "confirmed_vin";
                     await _botClient.SendTextMessageAsync(chatId, "✅ VIN confirmed");
+
+                    await _botClient.EditMessageReplyMarkupAsync(chatId: chatId, messageId: callbackQuery.Message.MessageId, replyMarkup: null);
+
                     await PromptPriceConfirmationAsync(chatId);
                     break;
 
                 case "confirm_no_vin":
                     _userState[chatId] = "awaiting_vin";
                     _userData.TryRemove(chatId, out _);
-                    await _botClient.SendTextMessageAsync(chatId, "❌ Let's try again. Please send another Car Title image (file)");
+                    await _botClient.SendTextMessageAsync(chatId, "❌ Let's try again. Please send another Car Title image (as a file)");
+                    
+                    await _botClient.EditMessageReplyMarkupAsync(chatId: chatId, messageId: callbackQuery.Message.MessageId, replyMarkup: null);
+
                     break;
 
                 case "agree_price":
                     await _botClient.SendTextMessageAsync(chatId, "🎉 Thank you! Generating your insurance policy...");
+                    
+                    await _botClient.EditMessageReplyMarkupAsync(chatId: chatId, messageId: callbackQuery.Message.MessageId, replyMarkup: null);
+
                     await Task.Delay(1000);
                     await GenerateAndSendPolicyAsync(chatId);
                     break;
 
                 case "disagree_price":
+                    await _botClient.EditMessageReplyMarkupAsync(chatId: chatId, messageId: callbackQuery.Message.MessageId, replyMarkup: null);
+
                     await ShowFinalChanceButtonsAsync(chatId);
                     break;
 
                 case "final_agree":
                     await _botClient.SendTextMessageAsync(chatId, "🚀 Glad you reconsidered! Generating your policy...");
+                    
+                    await _botClient.EditMessageReplyMarkupAsync(chatId: chatId, messageId: callbackQuery.Message.MessageId, replyMarkup: null);
+
                     await Task.Delay(1000);
                     await GenerateAndSendPolicyAsync(chatId);
                     break;
@@ -126,10 +146,12 @@ namespace Car_Insurance_Bot.Handlers
                 await _botClient.SendTextMessageAsync(chatId, "User data not found. Please /start again");
                 return;
             }
+            _userState[chatId] = "completed";
 
             var vin = new VinMock().Vin("");
             var policyText = await _insuranceService.GeneratePolicyAsync(userInfo.Name, userInfo.Passport, vin);
             var escaped = _escaper.EscapeMarkdown(policyText);
+
             await _botClient.SendTextMessageAsync(chatId, escaped, parseMode: ParseMode.MarkdownV2);
         }
     }

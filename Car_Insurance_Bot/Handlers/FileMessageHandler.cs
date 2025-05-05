@@ -16,7 +16,8 @@ namespace Car_Insurance_Bot.Handlers
         private readonly MindeeService _mindeeService;
         private readonly MindeePassportService _mindeePassportService;
         private readonly string _botToken;
-        private readonly ConcurrentDictionary<long, (string Name, string Passport)> _userData;
+        private readonly ConcurrentDictionary<long, (string Name, string Passport)> _userPassportData;
+        private readonly ConcurrentDictionary<long, string> _userVinData;
         private readonly ConcurrentDictionary<long, string> _userState;
 
         public FileMessageHandler(
@@ -24,14 +25,16 @@ namespace Car_Insurance_Bot.Handlers
             MindeePassportService mindeePassportSerivice,
             MindeeService mindeeService,
             string botToken,
-            ConcurrentDictionary<long, (string Name, string Passport)> userData,
+            ConcurrentDictionary<long, (string Name, string Passport)> userPassportData,
+            ConcurrentDictionary<long, string> userVinData,
             ConcurrentDictionary<long, string> userState)
         {
             _botClient = botClient;
             _mindeePassportService = mindeePassportSerivice;
             _mindeeService = mindeeService;
             _botToken = botToken;
-            _userData = userData;
+            _userPassportData = userPassportData;
+            _userVinData = userVinData;
             _userState = userState;
         }
 
@@ -96,7 +99,8 @@ namespace Car_Insurance_Bot.Handlers
             await _botClient.SendTextMessageAsync(chatId, "🔍 Processing your Passport image... Please wait.");
 
             var (fullname, idNumber) = await _mindeePassportService.ProcessPassportAsync(path);
-            _userData[chatId] = (fullname, idNumber);
+            _userPassportData[chatId] = (fullname, idNumber);
+
             _userState[chatId] = "awaiting_passport";
 
             var confirmButtons = new InlineKeyboardMarkup(new[]
@@ -113,6 +117,8 @@ namespace Car_Insurance_Bot.Handlers
             await _botClient.SendTextMessageAsync(chatId, "🔍 Processing your Car Title image... Please wait.");
 
             var vin = await _mindeeService.ProcessDocumentAsync(path);
+            _userVinData[chatId] = vin;
+
             _userState[chatId] = "awaiting_vin";
 
             var confirmButtons = new InlineKeyboardMarkup(new[]

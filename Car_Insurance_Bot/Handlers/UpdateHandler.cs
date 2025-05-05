@@ -16,7 +16,8 @@ namespace Car_Insurance_Bot.Handlers
         private readonly string? _botToken;
         private readonly MindeePassportService _mindeePassportService;
         private readonly MindeeService _mindeeService;
-        private static readonly ConcurrentDictionary<long, (string Name, string Passport)> _userData = new();
+        private static readonly ConcurrentDictionary<long, (string Name, string Passport)> _userPassportData = new();
+        private static readonly ConcurrentDictionary<long, string> _userVinData = new();
         private static readonly ConcurrentDictionary<long, string> _userState = new();
         private readonly GeminiHandler _geminiHandler;
         private readonly TextMessageHandler _textMessageHandler;
@@ -34,8 +35,8 @@ namespace Car_Insurance_Bot.Handlers
             _botToken = configuration["Telegram:BotToken"];
 
             _textMessageHandler = new TextMessageHandler(_botClient, _geminiHandler, _userState);
-            _fileMessageHandler = new FileMessageHandler(_botClient, _mindeePassportService, _mindeeService, _botToken!, _userData, _userState);
-            _callbackHandler = new CallbackHandler(_botClient, _insuranceService, _mindeePassportService, _mindeeService, _userData, _userState);
+            _fileMessageHandler = new FileMessageHandler(_botClient, _mindeePassportService, _mindeeService, _botToken!, _userPassportData, _userVinData, _userState);
+            _callbackHandler = new CallbackHandler(_botClient, _insuranceService, _mindeePassportService, _mindeeService, _userPassportData, _userVinData, _userState);
         }
 
         public async Task HandleUpdateAsync(ITelegramBotClient botClient, Update update, CancellationToken ct)

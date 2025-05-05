@@ -15,7 +15,8 @@ namespace Car_Insurance_Bot.Handlers
         private readonly ITelegramBotClient _botClient;
         private readonly InsuranceService _insuranceService;
         private readonly MindeeService _mindeeService;
-        private readonly ConcurrentDictionary<long, (string Name, string Passport)> _userData;
+        private readonly ConcurrentDictionary<long, (string Name, string Passport)> _userPassportData;
+        private readonly ConcurrentDictionary<long, string> _userVinData;
         private readonly ConcurrentDictionary<long, string> _userState;
         private readonly MarkDownEscaper _escaper;
 
@@ -24,13 +25,16 @@ namespace Car_Insurance_Bot.Handlers
             InsuranceService insuranceService,
             MindeePassportService mindeePassportService,
             MindeeService mindeeService,
-            ConcurrentDictionary<long, (string Name, string Passport)> userData,
+            ConcurrentDictionary<long, (string Name, string Passport)> userPassportData,
+            ConcurrentDictionary<long, string> userVinData,
+
             ConcurrentDictionary<long, string> userState)
         {
             _botClient = botClient;
             _insuranceService = insuranceService;
             _mindeeService = mindeeService;
-            _userData = userData;
+            _userVinData = userVinData;
+            _userPassportData = userPassportData;
             _userState = userState;
             _escaper = new MarkDownEscaper();
         }
@@ -52,7 +56,8 @@ namespace Car_Insurance_Bot.Handlers
 
                 case "confirm_no_passport":
                     _userState[chatId] = "awaiting_passport";
-                    _userData.TryRemove(chatId, out _);
+                    _userPassportData.TryRemove(chatId, out _);
+
                     await _botClient.SendTextMessageAsync(chatId, "❌ Let's try again. Please send another Passport image (as a file)");
                     
                     await _botClient.EditMessageReplyMarkupAsync(chatId: chatId, messageId: callbackQuery.Message.MessageId, replyMarkup: null);
@@ -70,7 +75,8 @@ namespace Car_Insurance_Bot.Handlers
 
                 case "confirm_no_vin":
                     _userState[chatId] = "awaiting_vin";
-                    _userData.TryRemove(chatId, out _);
+                    _userVinData.TryRemove(chatId, out _);
+
                     await _botClient.SendTextMessageAsync(chatId, "❌ Let's try again. Please send another Car Title image (as a file)");
                     
                     await _botClient.EditMessageReplyMarkupAsync(chatId: chatId, messageId: callbackQuery.Message.MessageId, replyMarkup: null);
@@ -141,17 +147,21 @@ namespace Car_Insurance_Bot.Handlers
 
         private async Task GenerateAndSendPolicyAsync(long chatId)
         {
-            if (!_userData.TryGetValue(chatId, out var userInfo))
+            if (!_userPassportData.TryGetValue(chatId, out var userInfo))
             {
-                await _botClient.SendTextMessageAsync(chatId, "User data not found. Please /start again");
+                await _botClient.SendTextMessageAsync(chatId, "Passport data not found. Please /start again");
                 return;
             }
-            _userState[chatId] = "completed";
 
-            var vin = new VinMock().Vin("");
+            if (!_userVinData.TryGetValue(chatId, out var vinInfo))
+            {
+                await _botClient.SendTextMessageAsync(chatId, "User data not found. Please /start again.");
+                return;
+            }
+
+            var vin = vinInfo; 
             var policyText = await _insuranceService.GeneratePolicyAsync(userInfo.Name, userInfo.Passport, vin);
             var escaped = _escaper.EscapeMarkdown(policyText);
-
             await _botClient.SendTextMessageAsync(chatId, escaped, parseMode: ParseMode.MarkdownV2);
         }
     }

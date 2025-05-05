@@ -40,6 +40,7 @@ namespace Car_Insurance_Bot.Handlers
                     {
                         _userState[chatId] = "idle";
                         await _botClient.SendTextMessageAsync(chatId, "👋 Welcome to the Car Insurance Assistant.\n\nTo begin the vehicle insurance application process, please type /insurance");
+                        await _botClient.SendTextMessageAsync(chatId, "ℹ️ If you need help at any point, type /help");
                     }
                     else if (userInput == "/insurance")
                     {

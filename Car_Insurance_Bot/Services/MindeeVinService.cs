@@ -27,9 +27,9 @@ namespace Car_Insurance_Bot.Services
                 throw new ArgumentNullException(nameof(filePath), "File path is missing.");
 
             CustomEndpoint endpoint = new CustomEndpoint(
-                endpointName: "vin",
-                accountName: "vzxtq17171",
-                version: "1"
+            endpointName: "vin",
+            accountName: "Terosss",
+            version: "1"
             );
 
             var response = await _mindeeClient

@@ -29,7 +29,6 @@ namespace Car_Insurance_Bot.Handlers
             switch (userInput?.ToLower())
             {
                 case "/start":
-                case "/insurance":
                     if (_userState.TryGetValue(chatId, out var stated) && stated != "idle" && stated != "canceled")
                     {
                         await _botClient.SendTextMessageAsync(chatId, "⚠️ An insurance process is already in progress.\nIf you wish to restart, please use /cancel first");
@@ -38,19 +37,16 @@ namespace Car_Insurance_Bot.Handlers
 
                     if (userInput == "/start")
                     {
-                        _userState[chatId] = "idle";
-                        await _botClient.SendTextMessageAsync(chatId,
-                            "👋 Welcome to the Car Insurance Assistant!\n\n" +
-                            "To apply for your vehicle insurance, you'll need to upload:\n" +
-                            "📄 A photo of your passport\n" +
-                            "🚗 And a photo of your car title (showing the VIN number)\n\n" +
-                            "To begin, type /insurance");                        
-                        await _botClient.SendTextMessageAsync(chatId, "ℹ️ If you need help at any point, type /help");
-                    }
-                    else if (userInput == "/insurance")
-                    {
                         _userState[chatId] = "awaiting_passport";
-                        await _botClient.SendTextMessageAsync(chatId, "📄 Please upload a clear image of your passport.\nThis is required to extract your personal information for the insurance contract");
+                          await _botClient.SendTextMessageAsync(chatId,
+                                "👋 Welcome to the Car Insurance Assistant.\n\nTo begin, please prepare the following documents:\n" +
+                                "📄 A photo of your passport\n🚗 A photo of your vehicle title showing the VIN number");
+
+                        await Task.Delay(1000);
+
+                         _userState[chatId] = "awaiting_passport";
+                        await _botClient.SendTextMessageAsync(chatId, "Please send a clear photo of the main page of your passport");
+                      
                     }
                 return;
                 
@@ -58,11 +54,6 @@ namespace Car_Insurance_Bot.Handlers
                     _userState.TryRemove(chatId, out _);
                     _userState[chatId] = "idle";
                     await _botClient.SendTextMessageAsync(chatId, "❌ The insurance process has been cancelled.\nTo restart, please type /start at any time");
-                    return;
-
-                case "/help":
-                    _userState[chatId] = "awaiting_passport";
-                    await _botClient.SendTextMessageAsync(chatId, "Help Menu\n\n/cancel — Cancel the current process \n\n🤖 You may also ask questions at any time. Our AI assistant is here to support you throughout the application");
                     return;
             }
 
@@ -76,19 +67,19 @@ namespace Car_Insurance_Bot.Handlers
             switch(state)
             {
                 case "awaiting_passport":
-                    prompt = $"The user is in the insurance flow and has not uploaded a passport yet. They asked: '{message.Text}'. Explain why the passport photo is needed for insurance in a friendly and clear way.";
+                    prompt = $"The user is in the 'passport upload' stage and asked: '{message.Text}'. Respond briefly and clearly. Then remind them to upload a clear photo of their passport to continue.";
                     break;
-                
+
                 case "awaiting_vin":
-                    prompt = $"The user is in the VIN stage and asked: '{message.Text}'. Explain why the VIN is required and how to properly photograph the VIN document.";
+                    prompt = $"The user is in the VIN stage and asked: '{message.Text}'. Respond briefly, explain why the VIN is required and how to take a proper photo. Then remind them to upload the VIN document.";
                     break;
-                
+
                 case "completed":
-                    prompt = $"The insurance process is complete and the policy has been generated. The user asked: '{message.Text}'. Respond helpfully and briefly, assuming they may have questions about their policy, coverage, changes, or next steps.";
+                    prompt = $"The user's insurance process is complete. They asked: '{message.Text}'. Respond briefly and helpfully. Offer support for next steps, policy questions, or changes.";
                     break;
-                
+
                 default:
-                    prompt = $"The user is in state '{state}' and asked: '{message.Text}'. Reply briefly, helpfully, and in context.";
+                    prompt = $"The user is in state '{state}' and asked: '{message.Text}'. Respond briefly and helpfully in a professional tone.";
                     break;
             }
 

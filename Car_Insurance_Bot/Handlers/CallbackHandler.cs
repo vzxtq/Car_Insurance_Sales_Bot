@@ -48,25 +48,25 @@ namespace Car_Insurance_Bot.Handlers
             {
                 case "confirm_yes_passport":
                     _userState[chatId] = "awaiting_vin";
-                    await _botClient.SendTextMessageAsync(chatId, "🆗 Passport confirmed.\n\nNow please send a photo of your Car Title");
+                    await _botClient.SendTextMessageAsync(chatId, "🆗 Passport confirmed");
+                    await Task.Delay(1000);
+                    await _botClient.SendTextMessageAsync(chatId, " Please upload a photo of your Vehicle Title (with VIN clearly visible)");
                     
                     await _botClient.EditMessageReplyMarkupAsync(chatId: chatId, messageId: callbackQuery.Message.MessageId, replyMarkup: null);
-                    
                     break;
 
                 case "confirm_no_passport":
                     _userState[chatId] = "awaiting_passport";
                     _userPassportData.TryRemove(chatId, out _);
 
-                    await _botClient.SendTextMessageAsync(chatId, "❌ Let's try again. Please send another Passport image");
+                    await _botClient.SendTextMessageAsync(chatId, "❌ Passport not confirmed.\n\nPlease upload a new photo of your passport.");
                     
                     await _botClient.EditMessageReplyMarkupAsync(chatId: chatId, messageId: callbackQuery.Message.MessageId, replyMarkup: null);
-
                     break;
 
                 case "confirm_yes_vin":
                     _userState[chatId] = "confirmed_vin";
-                    await _botClient.SendTextMessageAsync(chatId, "✅ VIN confirmed");
+                    await _botClient.SendTextMessageAsync(chatId, "✅ Vehicle Title confirmed");
 
                     await _botClient.EditMessageReplyMarkupAsync(chatId: chatId, messageId: callbackQuery.Message.MessageId, replyMarkup: null);
 
@@ -77,10 +77,9 @@ namespace Car_Insurance_Bot.Handlers
                     _userState[chatId] = "awaiting_vin";
                     _userVinData.TryRemove(chatId, out _);
 
-                    await _botClient.SendTextMessageAsync(chatId, "❌ Let's try again. Please send another Car Title image");
+                    await _botClient.SendTextMessageAsync(chatId, "❌ VIN not confirmed.\n\nPlease upload a new image of the Vehicle Title with a clearly visible VIN number.");
                     
                     await _botClient.EditMessageReplyMarkupAsync(chatId: chatId, messageId: callbackQuery.Message.MessageId, replyMarkup: null);
-
                     break;
 
                 case "agree_price":
@@ -108,11 +107,11 @@ namespace Car_Insurance_Bot.Handlers
                     break;
 
                 case "final_disagree":
-                    await _botClient.SendTextMessageAsync(chatId, "Thank you for your time ❤️ If you change your mind, type /start again. Goodbye");
+                    await _botClient.SendTextMessageAsync(chatId, "Thank you for your time. If you change your mind, simply type /start to begin again.");
                     break;
 
                 default:
-                    await _botClient.SendTextMessageAsync(chatId, "⚠️ Unknown action");
+                    await _botClient.SendTextMessageAsync(chatId, "⚠️ Unknown action. Please try again.");
                     break;
             }
 
@@ -129,7 +128,7 @@ namespace Car_Insurance_Bot.Handlers
                     InlineKeyboardButton.WithCallbackData("No", "disagree_price")
                 }
             });
-            await _botClient.SendTextMessageAsync(chatId, "The insurance price is 100 USD. Do you agree?", replyMarkup: keyboard);
+            await _botClient.SendTextMessageAsync(chatId, "The insurance cost is 100 USD.\nWould you like to proceed?", replyMarkup: keyboard);
         }
 
         private async Task ShowFinalChanceButtonsAsync(long chatId)
@@ -142,20 +141,20 @@ namespace Car_Insurance_Bot.Handlers
                     InlineKeyboardButton.WithCallbackData("No", "final_disagree")
                 }
             });
-            await _botClient.SendTextMessageAsync(chatId, "The price is fixed at 100 USD. Would you like to proceed?", replyMarkup: keyboard);
+            await _botClient.SendTextMessageAsync(chatId, "The price is fixed at 100 USD.\nWould you like to continue with the policy?", replyMarkup: keyboard);
         }
 
         private async Task GenerateAndSendPolicyAsync(long chatId)
         {
             if (!_userPassportData.TryGetValue(chatId, out var userInfo))
             {
-                await _botClient.SendTextMessageAsync(chatId, "Passport data not found. Please /start again");
+                await _botClient.SendTextMessageAsync(chatId, "❗ Passport data is missing or incomplete.\nPlease type /cancel and restart the process.");
                 return;
             }
 
             if (!_userVinData.TryGetValue(chatId, out var vinInfo))
             {
-                await _botClient.SendTextMessageAsync(chatId, "User data not found. Please /start again.");
+                await _botClient.SendTextMessageAsync(chatId, "❗ Vehicle data is missing or incomplete.\nPlease type /cancel and restart the process..");
                 return;
             }
 

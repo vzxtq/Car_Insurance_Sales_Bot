@@ -8,14 +8,6 @@ RUN dotnet restore "Car_Insurance_Bot.csproj"
 COPY . .
 RUN dotnet build "Car_Insurance_Bot.csproj" -c Release -o /app/build
 
-RUN apt-get update && \
-    apt-get install -y \
-      tesseract-ocr \
-      libtesseract-dev \
-      libleptonica-dev \
-      libopencv-dev && \
-    rm -rf /var/lib/apt/lists/*
-
 FROM build AS publish
 RUN dotnet publish "Car_Insurance_Bot.csproj" -c Release -o /app/publish
 

@@ -45,7 +45,7 @@ namespace Car_Insurance_Bot.Handlers
                         await Task.Delay(1000);
 
                          _userState[chatId] = "awaiting_passport";
-                        await _botClient.SendTextMessageAsync(chatId, "Please send a clear photo of the main page of your passport");
+                        await _botClient.SendTextMessageAsync(chatId, "Please upload a clear photo of the main page of your passport");
                       
                     }
                 return;

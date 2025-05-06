@@ -50,7 +50,7 @@ namespace Car_Insurance_Bot.Handlers
                     _userState[chatId] = "awaiting_vin";
                     await _botClient.SendTextMessageAsync(chatId, "🆗 Passport confirmed");
                     await Task.Delay(1000);
-                    await _botClient.SendTextMessageAsync(chatId, " Please upload a photo of your Vehicle Title (with VIN clearly visible)");
+                    await _botClient.SendTextMessageAsync(chatId, " Please upload a photo of your vehicle title (with VIN clearly visible)");
                     
                     await _botClient.EditMessageReplyMarkupAsync(chatId: chatId, messageId: callbackQuery.Message.MessageId, replyMarkup: null);
                     break;
@@ -66,7 +66,7 @@ namespace Car_Insurance_Bot.Handlers
 
                 case "confirm_yes_vin":
                     _userState[chatId] = "confirmed_vin";
-                    await _botClient.SendTextMessageAsync(chatId, "✅ Vehicle Title confirmed");
+                    await _botClient.SendTextMessageAsync(chatId, "✅ Vehicle title confirmed");
 
                     await _botClient.EditMessageReplyMarkupAsync(chatId: chatId, messageId: callbackQuery.Message.MessageId, replyMarkup: null);
 
@@ -77,7 +77,7 @@ namespace Car_Insurance_Bot.Handlers
                     _userState[chatId] = "awaiting_vin";
                     _userVinData.TryRemove(chatId, out _);
 
-                    await _botClient.SendTextMessageAsync(chatId, "❌ VIN not confirmed.\n\nPlease upload a new image of the Vehicle Title with a clearly visible VIN number.");
+                    await _botClient.SendTextMessageAsync(chatId, "❌ VIN not confirmed.\n\nPlease upload a new image of the vehicle title with a clearly visible VIN number.");
                     
                     await _botClient.EditMessageReplyMarkupAsync(chatId: chatId, messageId: callbackQuery.Message.MessageId, replyMarkup: null);
                     break;

@@ -45,29 +45,21 @@ Create an `appsettings.json` in the project root:
 ## Bot Commands
 
 ### **/start**
-- **Description**: Greets the user and guides them to start the process by typing `/insurance`.
-
-### **/insurance**
 - **Description**: Begins the vehicle insurance process. The bot will ask the user to upload their passport image to extract necessary personal information
 
 ### **/cancel**
 - **Description**: Cancels the current insurance process. If you decide to restart the process, simply type `/start` to begin the process from the beginning
-
-### **/help**
-- **Description**: Provides information about the bot and available commands. If you have any questions, you can always ask for help at any stage of the process
 
 ---
 
 ## Example User Flow
 
 **User:** `/start`  
-**Bot:** "👋 Welcome to the Car Insurance Assistant! To apply for your vehicle insurance, you'll need to upload:
-          📄 A photo of your passport 
-          🚗 And a photo of your car title (showing the VIN number)
-          To begin, type /insurance                       
-
-**User:** `/insurance`  
-**Bot:** 📄 Please upload a clear image of your passport. This is required to extract your personal information for the insurance contract
+**Bot:** "👋 Welcome to the Car Insurance Assistant.
+            To begin, please prepare the following documents:
+            📄 A photo of your passport
+            🚗 A photo of your vehicle title showing the VIN number                      
+**Bot:** Please send a clear photo of the main page of your passport
 
 **User:** *uploads Passport image*  
 **Bot:** Extracted info:
@@ -78,7 +70,8 @@ Passport: 340003955
 **Bot:** Correct? *(Confirm / Incorrect)*
 
 **User:** *clicks Confirm*
-**Bot:** 🆗 Passport confirmed. Now please send a photo of your Car Title (VIN)
+**Bot:** 🆗 Passport confirmed
+**Bot:** Please upload a photo of your vehicle title (with VIN clearly visible)
 
 **User:** *uploads Car Title image*
 **Bot:** Extracted info:
@@ -88,7 +81,7 @@ VIN: 00000000000000000
 **Bot:** Correct? *(Confirm / Incorrect)*
 
 **User:** *clicks Confirm*
-**Bot:** The insurance price is 100 USD. Do you agree? *(Yes / No)*
+**Bot:** The insurance cost is 100 USD. Would you like to proceed? *(Yes / No)*
 
 **User:** *clicks Yes*  
 **Bot:** Thank you! Generating your insurance policy...  

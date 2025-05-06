@@ -132,7 +132,7 @@ namespace Car_Insurance_Bot.Handlers
 
         private async Task ProcessVinAsync(long chatId, string path)
         {
-            await _botClient.SendTextMessageAsync(chatId, "🔍 Processing your Car Title image... Please wait.");
+            await _botClient.SendTextMessageAsync(chatId, "🔍 Processing your vehicle title image... Please wait.");
 
             var vin = await _mindeeService.ProcessDocumentAsync(path);
             _userVinData[chatId] = vin;
@@ -146,7 +146,7 @@ namespace Car_Insurance_Bot.Handlers
             });
             if (string.IsNullOrEmpty(vin))
             {
-                await _botClient.SendTextMessageAsync(chatId, "❌ VIN not found. Please send a clear image of your Car Title.");
+                await _botClient.SendTextMessageAsync(chatId, "❌ VIN not found. Please upload a clear image of your Car Title.");
                 return;
             }
 

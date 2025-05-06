@@ -39,11 +39,12 @@ namespace Car_Insurance_Bot.Handlers
                     {
                         _userState[chatId] = "awaiting_passport";
                           await _botClient.SendTextMessageAsync(chatId,
-                                "👋 Welcome to the Car Insurance Assistant.\n\nTo begin, please prepare the following documents:\n" +
-                                "📄 A photo of your passport\n🚗 A photo of your vehicle title showing the VIN number");
+                            "👋 Welcome to the Car Insurance Assistant!\n\nI'll help you get your car insured — quick and easy.\n\n" +
+                            "To get started, please prepare the following documents:\n" +
+                            "📄 A photo of your passport\n" +
+                            "🚗 A photo of your vehicle title with the VIN number visible");
 
                         await Task.Delay(1000);
-
                          _userState[chatId] = "awaiting_passport";
                         await _botClient.SendTextMessageAsync(chatId, "Please upload a clear photo of the main page of your passport");
                       

@@ -28,7 +28,7 @@ namespace Car_Insurance_Bot.Services
 
             CustomEndpoint endpoint = new CustomEndpoint(
             endpointName: "vin",
-            accountName: "vzxtq",
+            accountName: "orp",
             version: "1"
             );
 

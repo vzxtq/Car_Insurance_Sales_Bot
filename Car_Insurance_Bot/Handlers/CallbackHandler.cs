@@ -50,7 +50,7 @@ namespace Car_Insurance_Bot.Handlers
                     _userState[chatId] = "awaiting_vin";
                     await _botClient.SendTextMessageAsync(chatId, "🆗 Passport confirmed");
                     await Task.Delay(1000);
-                    await _botClient.SendTextMessageAsync(chatId, " Please upload a photo of your vehicle title (with VIN clearly visible)");
+                    await _botClient.SendTextMessageAsync(chatId, " Please upload a photo of your vehicle title\n(with VIN clearly visible)");
                     
                     await _botClient.EditMessageReplyMarkupAsync(chatId: chatId, messageId: callbackQuery.Message.MessageId, replyMarkup: null);
                     break;

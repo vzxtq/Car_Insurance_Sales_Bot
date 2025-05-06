@@ -114,7 +114,7 @@ namespace Car_Insurance_Bot.Handlers
 
         private async Task ProcessPassportAsync (long chatId, string path)
         {
-            await _botClient.SendTextMessageAsync(chatId, "🔍 Processing your Passport image... Please wait.");
+            await _botClient.SendTextMessageAsync(chatId, "🔍 Processing your passport image... Please wait.");
 
             var (fullname, idNumber) = await _mindeePassportService.ProcessPassportAsync(path);
             _userPassportData[chatId] = (fullname, idNumber);
